@@ -5,32 +5,23 @@ import tomllib as tl
 current_module_dir = Path(__file__).resolve().parent
 
 # Load datasheet data from a TOML file
-datasheet = current_module_dir / "data" / "warhammer_datasheets_10e.toml"
+datasheets_path = current_module_dir / "data" / "warhammer_datasheets_10e.toml"
 
 try:
-    print(datasheet.absolute())
-    with open(datasheet, "rb") as f:
+    print(datasheets_path.absolute())
+    with open(datasheets_path, "rb") as f:
         datasheets = tl.load(f)
 except FileNotFoundError:
-    print(f"Error: Datasheet file '{datasheet}' not found.")
+    print(f"Error: Datasheet file '{datasheets_path}' not found.")
     exit(1)
 except tl.TOMLDecodeError:
-    print(f"Error: Invalid format in '{datasheet}'.")
+    print(f"Error: Invalid format in '{datasheets_path}'.")
     exit(1)
 
 def roll_dice(num_dice, sides=6):
     """Simulates rolling multiple dice."""
 
     return [random.randint(1, sides) for _ in range(num_dice)]
-
-def get_unit(unit_name):
-    """Retrieves a unit's datasheet."""
-
-    if unit_name in datasheets:
-        return datasheets[unit_name]
-    else:
-        print(f"Unit '{unit_name}' not found.")
-        return None
 
 def simulate_attack(attacker, defender):
     """Simulates an attack sequence."""
@@ -41,7 +32,6 @@ def simulate_attack(attacker, defender):
     armor_penetration = weapon["armor_penetration"]
     damage = weapon["damage"]
     to_hit = weapon["to_hit"]
-    to_wound = attacker["to_wound"] #simplified for this example, in reality, it would be based on the defender's toughness.
 
     toughness = defender["toughness"]
     save = defender["save"]
@@ -110,12 +100,13 @@ def simulate_attack(attacker, defender):
     # Simplified damage application. In a real game, you'd track unit health.
     print(f"{defender['name']} takes {total_damage} damage.")
 
-# User Input
-attacker_name = input("Enter attacker unit name: ")
-defender_name = input("Enter defender unit name: ")
+# Choose attacker and defender
+unit_name_list = list(datasheets.keys())
+for idx, unit_name in enumerate(unit_name_list):
+    print(f"{idx} - {unit_name}")
+attacker_name = unit_name_list[int(input("Enter index of attacking unit: "))]
+attacker_unit = datasheets[attacker_name]
+defender_name = unit_name_list[int(input("Enter index of defending unit: "))]
+defender_unit = datasheets[defender_name]
 
-attacker_unit = get_unit(attacker_name)
-defender_unit = get_unit(defender_name)
-
-if attacker_unit and defender_unit:
-    simulate_attack(attacker_unit, defender_unit)
+simulate_attack(attacker_unit, defender_unit)
