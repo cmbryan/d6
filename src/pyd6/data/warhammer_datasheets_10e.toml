@@ -1,0 +1,13 @@
+["Space Marine Intercessor"]
+name = "Space Marine Intercessor"
+toughness = 4
+save = 3
+to_wound = 4
+
+  ["Space Marine Intercessor".weapon]
+  name = "Bolt Rifle"
+  attacks = 3
+  strength = 4
+  armor_penetration = 0
+  damage = 1
+  to_hit = 3

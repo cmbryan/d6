@@ -1,23 +1,31 @@
+from pathlib import Path
 import random
-import json
+import tomllib as tl
 
-# Load datasheet data from a JSON file
+current_module_dir = Path(__file__).resolve().parent
+
+# Load datasheet data from a TOML file
+datasheet = current_module_dir / "data" / "warhammer_datasheets_10e.toml"
+
 try:
-    with open("warhammer_datasheets_10e.json", "r") as f:
-        datasheets = json.load(f)
+    print(datasheet.absolute())
+    with open(datasheet, "rb") as f:
+        datasheets = tl.load(f)
 except FileNotFoundError:
-    print("Error: Datasheet file 'warhammer_datasheets_10e.json' not found.")
-    exit()
-except json.JSONDecodeError:
-    print("Error: Invalid JSON format in 'warhammer_datasheets_10e.json'.")
-    exit()
+    print(f"Error: Datasheet file '{datasheet}' not found.")
+    exit(1)
+except tl.TOMLDecodeError:
+    print(f"Error: Invalid format in '{datasheet}'.")
+    exit(1)
 
 def roll_dice(num_dice, sides=6):
     """Simulates rolling multiple dice."""
+
     return [random.randint(1, sides) for _ in range(num_dice)]
 
 def get_unit(unit_name):
     """Retrieves a unit's datasheet."""
+
     if unit_name in datasheets:
         return datasheets[unit_name]
     else:
@@ -101,58 +109,6 @@ def simulate_attack(attacker, defender):
 
     # Simplified damage application. In a real game, you'd track unit health.
     print(f"{defender['name']} takes {total_damage} damage.")
-
-# Example Datasheet (replace with your full dataset)
-example_datasheets = {
-    "Space Marine Intercessor": {
-        "name": "Space Marine Intercessor",
-        "toughness": 4,
-        "save": 3,
-        "weapon": {
-            "name": "Bolt Rifle",
-            "attacks": 3,
-            "strength": 4,
-            "armor_penetration": 0,
-            "damage": 1,
-            "to_hit": 3,
-        },
-        "to_wound": 4, #simplified to_wound
-    },
-    "Ork Boy": {
-        "name": "Ork Boy",
-        "toughness": 5,
-        "save": 6,
-        "weapon": {
-            "name": "Slugga",
-            "attacks": 2,
-            "strength": 4,
-            "armor_penetration": 0,
-            "damage": 1,
-            "to_hit": 4,
-        },
-        "to_wound": 4, #simplified to_wound
-    },
-    "Terminator":{
-        "name": "Terminator",
-        "toughness": 5,
-        "save": 2,
-        "invulnerable_save": 4,
-        "weapon":{
-            "name": "Power Fist",
-            "attacks": 3,
-            "strength": 9,
-            "armor_penetration": 2,
-            "damage": 2,
-            "to_hit": 3,
-        },
-        "to_wound": 4, #simplified to_wound
-    }
-
-}
-
-# Save Example datasheets to Json.
-with open("warhammer_datasheets_10e.json", "w") as outfile:
-    json.dump(example_datasheets, outfile, indent=4)
 
 # User Input
 attacker_name = input("Enter attacker unit name: ")
