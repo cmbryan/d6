@@ -1,6 +1,8 @@
 from pathlib import Path
-import random
+import re
 import tomllib as tl
+
+from util import convert_to_dot_dict, parse_stat, roll_dice, to_int
 
 current_module_dir = Path(__file__).resolve().parent
 
@@ -10,7 +12,7 @@ datasheets_path = current_module_dir / "data" / "warhammer_datasheets_10e.toml"
 try:
     print(datasheets_path.absolute())
     with open(datasheets_path, "rb") as f:
-        datasheets = tl.load(f)
+        datasheets = convert_to_dot_dict(tl.load(f))
 except FileNotFoundError:
     print(f"Error: Datasheet file '{datasheets_path}' not found.")
     exit(1)
@@ -18,90 +20,80 @@ except tl.TOMLDecodeError:
     print(f"Error: Invalid format in '{datasheets_path}'.")
     exit(1)
 
-def roll_dice(num_dice, sides=6):
-    """Simulates rolling multiple dice."""
-
-    return [random.randint(1, sides) for _ in range(num_dice)]
-
 def simulate_attack(attacker, defender):
     """Simulates an attack sequence."""
 
-    weapon = attacker["weapon"]  # Assuming one weapon for simplicity.
-    attacks = weapon["attacks"]
-    strength = weapon["strength"]
-    armor_penetration = weapon["armor_penetration"]
-    damage = weapon["damage"]
-    to_hit = weapon["to_hit"]
+    # Choose a weapon
+    weapon_name_list = list(attacker.Weapons.keys())
+    for idx, weapon_name in enumerate(weapon_name_list):
+        print(f"{idx} - {weapon_name}")
+    weapon_name = weapon_name_list[int(input("Enter index of chosen weapon: "))]
+    weapon = attacker.Weapons[weapon_name]
 
-    toughness = defender["toughness"]
-    save = defender["save"]
+    # Work out number of attacks
+    # This is either a plain number of dice, or a roll to detirmine the number of dynamic attacks
+    attacks = weapon.attacks
+    dynamic_attacks = re.match(r"(?P<num_dice>)?D6(\+(?P<modifier>\d))", str(weapon.attacks))
+    if dynamic_attacks:
+        num_dice = to_int(dynamic_attacks.group("num_dice")) or 1
+        modifier = to_int(dynamic_attacks.group("modifier"))
+        roll = sum(roll_dice(num_dice))
+        attacks = roll + num_dice*modifier  # Check this modifier logic. Does it even happen?
+        print(f"  Number of attacks is {roll} + {num_dice}*{modifier} => {attacks}")
+
     # invulnerable_save = defender.get("invulnerable_save", 99) # 99 means no invuln save.
 
-    print(f"\n\U0001F5E1 \U0001F5E1 \U0001F5E1  \033[31m{attacker['name']}\033[0m"
+    print(f"\n\U0001F5E1 \U0001F5E1 \U0001F5E1  \033[31m{attacker.name}\033[0m"
           " attacks"
-          " \033[34m{defender['name']}\033[0m \U0001F6E1\uFE0F \U0001F6E1\uFE0F \U0001F6E1\uFE0F")
-    print(f"  {attacker['name']} attacks with {weapon['name']} ({attacks} attacks).")
+          f" \033[34m{defender.name}\033[0m \U0001F6E1\uFE0F \U0001F6E1\uFE0F \U0001F6E1\uFE0F")
+
+    print(f"  Attacking with {weapon.name} ({attacks} attacks)...")
 
     # To Hit Rolls
-    hit_rolls = roll_dice(attacks)
-    hits = [roll for roll in hit_rolls if roll >= to_hit]
-    num_hits = len(hits)
-    print(f"  To Hit: {hit_rolls} ({num_hits} hits)")
+    hits = roll_dice(attacks, success_threshold=parse_stat(weapon.weapon_skill))
+    print(f"  Hits: {hits} ({len(hits)})")
 
-    if num_hits == 0:
+    if not hits:
         print("  No hits! Attack sequence ends.")
         return
 
-    # To Wound Rolls
-    wound_rolls = roll_dice(num_hits)
-    wounds = []
-    for roll in wound_rolls:
-        if strength >= (toughness * 2):
-            if roll >= 2:
-                wounds.append(roll)
-        elif strength > toughness:
-            if roll >= 3:
-                wounds.append(roll)
-        elif strength == toughness:
-            if roll >= 4:
-                wounds.append(roll)
-        elif strength < toughness:
-            if roll >= 5:
-                wounds.append(roll)
-        elif strength <= (toughness / 2):
-            if roll >= 6:
-                wounds.append(roll)
-        else:
-            print("  Error: Could not determine to wound roll")
-    num_wounds = len(wounds)
+    # Wound Rolls
+    if weapon.strength >= (defender.toughness * 2):
+        success_threshold = 2
+    elif weapon.strength > defender.toughness:
+        success_threshold = 3
+    elif weapon.strength == defender.toughness:
+        success_threshold = 4
+    elif weapon.strength < defender.toughness:
+        success_threshold = 5
+    elif weapon.strength <= (defender.toughness / 2):
+        success_threshold = 6
+    else:
+        print("  Error: Could not determine to wound roll")
+        return
 
-    print(f"  To Wound: {wound_rolls} ({num_wounds} wounds)")
+    print(f"  {weapon.name}'s strength is {weapon.strength}, {defender.name}'s toughness is {defender.toughness},"
+          f" therefore a {success_threshold}+ is required to inflict damage")
 
-    if num_wounds == 0:
+    wounds = roll_dice(len(hits), success_threshold=success_threshold)
+    print(f"  Wounds: {wounds} ({len(wounds)})")
+
+    if not wounds:
         print("  No wounds! Attack sequence ends.")
         return
 
     # Saving Throws
-    saved_wounds = 0
-    failed_saves = 0
-    for _ in range(num_wounds):
-        save_roll = random.randint(1, 6)
-        modified_save = save + armor_penetration
-        if modified_save > 6:
-            modified_save = 6
-        # if save_roll >= min(modified_save, invulnerable_save):
-        if save_roll >= modified_save:
-            saved_wounds += 1
-        else:
-            failed_saves +=1
-    print(f"  Saving Throws: {num_wounds} wounds, {saved_wounds} saved, {failed_saves} failed.")
+    save_threshold = min(parse_stat(defender.save) - weapon.armour_penetration, 6)  # AP is negative
+    print(f"Save threshold is {parse_stat(defender.save)} - {weapon.armour_penetration} => {save_threshold}")
+    saved_wounds = len(roll_dice(len(wounds), success_threshold=save_threshold))
+    print(f"  Wounds saved: {saved_wounds} saved.")
 
     # Damage Application
-    total_damage = failed_saves * damage
-    print(f"  Damage inflicted: {total_damage}")
+    total_damage = (len(wounds) - saved_wounds) * weapon.damage
+    print(f"  Damage inflicted: {len(wounds) - saved_wounds} * {weapon.damage} => {total_damage}")
 
     # Simplified damage application. In a real game, you'd track unit health.
-    print(f"  {defender['name']} takes {total_damage} damage.")
+    print(f"\n  \033[34m{defender.name}\033[0m takes {total_damage} damage.")
 
 # Choose attacker and defender
 unit_name_list = list(datasheets.keys())

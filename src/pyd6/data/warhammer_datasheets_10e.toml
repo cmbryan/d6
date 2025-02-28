@@ -1,13 +1,33 @@
-["Space Marine Intercessor"]
-name = "Space Marine Intercessor"
-toughness = 4
-save = 3
-to_wound = 4
+["Captain in Terminator Armour"]
+name = "Captain in Terminator Armour"
+toughness = 5
+save = "2+"
+wounds = 6
 
-  ["Space Marine Intercessor".weapon]
-  name = "Bolt Rifle"
-  attacks = 3
-  strength = 4
-  armor_penetration = 0
-  damage = 1
-  to_hit = 3
+  ["Captain in Terminator Armour".Weapons]
+
+    ["Captain in Terminator Armour".Weapons."Relic weapon"]
+    name = "Relic weapon"
+    range = 0
+    attacks = 5
+    weapon_skill = "2+"
+    strength = 5
+    armour_penetration = -2
+    damage = 2
+
+[Psychophage]
+name = "Psychophage"
+toughness = 9
+save = "3+"
+wounds = 10
+
+  [Psychophage.Weapons]
+
+    [Psychophage.Weapons."Talons and betentacled maw"]
+    name = "Talons and betentacled maw"
+    range = 0
+    attacks = "D6+3"
+    weapon_skill = "3+"
+    strength = 6
+    armour_penetration = -1
+    damage = 2
