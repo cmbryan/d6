@@ -2,22 +2,41 @@
 
 A battle simulator for tabletop dice gaming
 
-## Developer info
+## Usage
 
-### Run
+1. **Run the Flask application**:
 
-```bash
-poetry install
-poetry run python src/pyd6/pyd6.py
-```
+   ```bash
+   poetry run python src/app.py
+   ```
 
-### Package
+2. **Access the application**:
+   Open your web browser and navigate to `http://127.0.0.1:5000`.
 
-```bash
-python3 -m pip install --upgrade build
-python3 -m build
-```
+3. **Simulate an attack**:
+   Use the provided endpoints to select units and simulate attacks. Refer to the API documentation for details on the available routes and parameters.
 
-To upload to PyPI, see <https://packaging.python.org/en/latest/tutorials/packaging-projects/>
+## API Documentation
 
-This will create a virtual environment in `.venv`.
+- **POST /simulate_attack**: Simulates an attack between two units.
+  - **Request Body**:
+
+    ```json
+    {
+      "attacker": "Attacker Unit Name",
+      "defender": "Defender Unit Name"
+    }
+    ```
+
+  - **Response**:
+
+    ```json
+    {
+      "result": "Damage inflicted",
+      "details": {
+        "hits": "Number of hits",
+        "wounds": "Number of wounds",
+        "saved_wounds": "Number of wounds saved"
+      }
+    }
+    ```
