@@ -35,19 +35,21 @@ def simulate_attack(attacker, defender):
 
     toughness = defender["toughness"]
     save = defender["save"]
-    invulnerable_save = defender.get("invulnerable_save", 99) # 99 means no invuln save.
+    # invulnerable_save = defender.get("invulnerable_save", 99) # 99 means no invuln save.
 
-    print(f"\n--- {attacker['name']} attacks {defender['name']} ---")
-    print(f"{attacker['name']} attacks with {weapon['name']} ({attacks} attacks).")
+    print(f"\n\U0001F5E1 \U0001F5E1 \U0001F5E1  \033[31m{attacker['name']}\033[0m"
+          " attacks"
+          " \033[34m{defender['name']}\033[0m \U0001F6E1\uFE0F \U0001F6E1\uFE0F \U0001F6E1\uFE0F")
+    print(f"  {attacker['name']} attacks with {weapon['name']} ({attacks} attacks).")
 
     # To Hit Rolls
     hit_rolls = roll_dice(attacks)
     hits = [roll for roll in hit_rolls if roll >= to_hit]
     num_hits = len(hits)
-    print(f"To Hit: {hit_rolls} ({num_hits} hits)")
+    print(f"  To Hit: {hit_rolls} ({num_hits} hits)")
 
     if num_hits == 0:
-        print("No hits! Attack sequence ends.")
+        print("  No hits! Attack sequence ends.")
         return
 
     # To Wound Rolls
@@ -70,13 +72,13 @@ def simulate_attack(attacker, defender):
             if roll >= 6:
                 wounds.append(roll)
         else:
-            print("Error: Could not determine to wound roll")
+            print("  Error: Could not determine to wound roll")
     num_wounds = len(wounds)
 
-    print(f"To Wound: {wound_rolls} ({num_wounds} wounds)")
+    print(f"  To Wound: {wound_rolls} ({num_wounds} wounds)")
 
     if num_wounds == 0:
-        print("No wounds! Attack sequence ends.")
+        print("  No wounds! Attack sequence ends.")
         return
 
     # Saving Throws
@@ -87,18 +89,19 @@ def simulate_attack(attacker, defender):
         modified_save = save + armor_penetration
         if modified_save > 6:
             modified_save = 6
-        if save_roll >= min(modified_save, invulnerable_save):
+        # if save_roll >= min(modified_save, invulnerable_save):
+        if save_roll >= modified_save:
             saved_wounds += 1
         else:
             failed_saves +=1
-    print(f"Saving Throws: {num_wounds} wounds, {saved_wounds} saved, {failed_saves} failed.")
+    print(f"  Saving Throws: {num_wounds} wounds, {saved_wounds} saved, {failed_saves} failed.")
 
     # Damage Application
     total_damage = failed_saves * damage
-    print(f"Damage inflicted: {total_damage}")
+    print(f"  Damage inflicted: {total_damage}")
 
     # Simplified damage application. In a real game, you'd track unit health.
-    print(f"{defender['name']} takes {total_damage} damage.")
+    print(f"  {defender['name']} takes {total_damage} damage.")
 
 # Choose attacker and defender
 unit_name_list = list(datasheets.keys())
