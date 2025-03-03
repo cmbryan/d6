@@ -9,7 +9,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "flask (>=3.1.0,<4.0.0)",
-    "dotdict (>=0.1,<0.2)"
+    "dotdict (>=0.1,<0.2)",
+    "gunicorn (>=23.0.0,<24.0.0)"
 ]
 
 [tool.poetry]

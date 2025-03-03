@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 
-from .app_logic import simulate_attack
+from d6_api.app_logic import simulate_attack
 
 
 app = Flask(__name__)

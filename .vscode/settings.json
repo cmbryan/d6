@@ -2,7 +2,6 @@
     "python.testing.pytestArgs": [
         "src"
     ],
-    "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.testing.cwd": "d6-api/d6_api/tests"
 }
