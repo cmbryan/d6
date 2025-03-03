@@ -15,6 +15,7 @@ dependencies = [
 
 [tool.poetry]
 packages = [{include = "d6_api", from = "src"}]
+package-mode = false  # This isn't meant for PyPI
 
 
 [tool.poetry.group.dev.dependencies]
