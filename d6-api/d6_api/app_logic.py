@@ -1,10 +1,8 @@
 from pathlib import Path
 import re
 import tomllib as tl
-from flask import Flask, request, jsonify
-from .util import convert_to_dot_dict, parse_stat, roll_dice, to_int
 
-app = Flask(__name__)
+from .util import convert_to_dot_dict, parse_stat, roll_dice, to_int
 
 current_module_dir = Path(__file__).resolve().parent
 
@@ -19,16 +17,17 @@ except FileNotFoundError:
 except tl.TOMLDecodeError:
     raise RuntimeError(f"Error: Invalid format in '{datasheets_path}'.")
 
-def simulate_attack(attacker, defender):
-    weapon_name_list = list(attacker.Weapons.keys())
-    weapon_name = weapon_name_list[int(request.json.get("weapon_index"))]
+
+def simulate_attack(attacker_name, defender_name, weapon_name):
+    attacker = datasheets[attacker_name]
+    defender = datasheets[defender_name]
     weapon = attacker.Weapons[weapon_name]
 
     attacks = weapon.attacks
-    dynamic_attacks = re.match(r"(?P<num_dice>)?D6(\+(?P<modifier>\d))", str(weapon.attacks))
-    if dynamic_attacks:
-        num_dice = to_int(dynamic_attacks.group("num_dice")) or 1
-        modifier = to_int(dynamic_attacks.group("modifier"))
+    random_attacks = re.match(r"(?P<num_dice>)?D6(\+(?P<modifier>\d))", str(weapon.attacks))
+    if random_attacks:
+        num_dice = to_int(random_attacks.group("num_dice")) or 1
+        modifier = to_int(random_attacks.group("modifier"))
         roll = sum(roll_dice(num_dice))
         attacks = roll + num_dice * modifier
 

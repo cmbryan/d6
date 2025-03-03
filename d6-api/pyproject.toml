@@ -1,0 +1,26 @@
+[project]
+name = "d6-api"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Chris Bryan",email = "chrismbryan@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask (>=3.1.0,<4.0.0)",
+    "dotdict (>=0.1,<0.2)"
+]
+
+[tool.poetry]
+packages = [{include = "d6_api", from = "src"}]
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+black = "^25.1.0"
+pytest-mock = "^3.14.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
