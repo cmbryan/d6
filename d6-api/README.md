@@ -13,6 +13,11 @@ Want to get involved? I'm looking for those with tabletop gaming expertise, rega
 
 This is the current focus of development.
 
+### Deployment
+
+Access: <https://d6-3bxh.onrender.com>
+Admin: <https://dashboard.render.com>
+
 ### Running in development
 
 ```bash
