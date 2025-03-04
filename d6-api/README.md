@@ -1,22 +1,31 @@
 # d6
 
-A battle simulator for tabletop dice gaming
+When playing tabletop war games such as Warhammer, I found I spent most of the game referring to stats cards to figure out the rules for dice rolling.
+For me, that took away a lot of the fun. Ideally, I'd like to say "I'm attacking your Psychophage with my Space Marines!" and then have the result of that battle given to me with as little thought as possible.
 
-## Usage
+`d6` is a dice rolling simulator that encodes the rules of the game and the stats of your units in order to automate as much of the boring stuff as possible.
 
-1. **Run the Flask application**:
+Still in the early stages of development, it is currently evolving to match the practice scenarios (and units) of the Warhammer 40k Starter Kit (10th edition). The ultimate aim, however, is to be as customizable and game-agnostic as possible.
 
-   ```bash
-   poetry run python src/app.py
-   ```
+Want to get involved? I'm looking for those with tabletop gaming expertise, regardless of technical prowess. Please get in touch!
 
-2. **Access the application**:
-   Open your web browser and navigate to `http://127.0.0.1:5000`.
+## API
 
-3. **Simulate an attack**:
-   Use the provided endpoints to select units and simulate attacks. Refer to the API documentation for details on the available routes and parameters.
+This is the current focus of development.
 
-## API Documentation
+### Running in development
+
+```bash
+FLASK_APP=d6_api/app.py poetry run flask run
+```
+
+### Running in production
+
+```bash
+poetry run gunicorn --chdir d6_api app:app
+```
+
+### Usage
 
 - **POST /simulate_attack**: Simulates an attack between two units.
   - **Request Body**:
