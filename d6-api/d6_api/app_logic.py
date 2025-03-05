@@ -16,6 +16,8 @@ except FileNotFoundError:
     raise RuntimeError(f"Error: Datasheet file '{datasheets_path}' not found.")
 except tl.TOMLDecodeError:
     raise RuntimeError(f"Error: Invalid format in '{datasheets_path}'.")
+units = list(datasheets.keys())
+weapons = sum([list(datasheets[unit].Weapons.keys()) for unit in datasheets], [])
 
 
 def simulate_attack(attacker_name, defender_name, weapon_name):

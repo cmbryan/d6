@@ -32,25 +32,4 @@ poetry run gunicorn --chdir d6_api app:app
 
 ### Usage
 
-- **POST /simulate_attack**: Simulates an attack between two units.
-  - **Request Body**:
-
-    ```json
-    {
-      "attacker": "Attacker Unit Name",
-      "defender": "Defender Unit Name"
-    }
-    ```
-
-  - **Response**:
-
-    ```json
-    {
-      "result": "Damage inflicted",
-      "details": {
-        "hits": "Number of hits",
-        "wounds": "Number of wounds",
-        "saved_wounds": "Number of wounds saved"
-      }
-    }
-    ```
+See the `/apidocs` endpoint.

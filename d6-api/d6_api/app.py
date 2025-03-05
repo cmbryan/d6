@@ -1,28 +1,69 @@
 from flask import Flask, request, jsonify
+from flask_restx import Api, Resource
+from flasgger import Swagger, swag_from
 
-from app_logic import simulate_attack
+from app_logic import units, weapons, simulate_attack
 
 
 app = Flask(__name__)
+api = Api(app)
+app.config["SWAGGER"] = {"title": "My API", "uiversion": 3}
+swagger = Swagger(app)
 
 
-@app.route('/')
+class Attack(Resource):
+    @swag_from(
+        {
+            "parameters": [
+                {
+                    "name": "attacker",
+                    "in": "query",
+                    "type": "string",
+                    "enum": units,
+                    "required": True,
+                    "description": "The attacking unit",
+                },
+                {
+                    "name": "defender",
+                    "in": "query",
+                    "type": "string",
+                    "enum": units,
+                    "required": True,
+                    "description": "The defending unit",
+                },
+                {
+                    "name": "weapon",
+                    "in": "query",
+                    "type": "string",
+                    "enum": weapons,
+                    "required": True,
+                    "description": "The attacker\s weapon",
+                },
+            ],
+            "responses": {
+                200: {
+                    "description": "The amount of damage resulting from the attack.",
+                    "type": "integer",
+                }
+            },
+        }
+    )
+    def get(self):
+        result = simulate_attack(
+            request.args.get("attacker"),
+            request.args.get("defender"),
+            request.args.get("weapon"),
+        )
+        return jsonify(result)
+
+
+api.add_resource(Attack, "/attack")
+
+
+@app.route("/")
 def hello_world():
-    return 'Hello, World!'
+    return "Hello, World!"
 
 
-@app.route('/simulate_attack', methods=['POST'])
-def attack():
-    return "TODO"
-    data = request.json
-    attacker_name = data.get('attacker')
-    defender_name = data.get('defender')
-    weapon_name = data.get('weapon')
-
-    result = simulate_attack(attacker_name, defender_name, weapon_name)
-
-    return jsonify(result)
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
