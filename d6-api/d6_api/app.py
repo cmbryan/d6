@@ -24,6 +24,13 @@ class Attack(Resource):
                     "description": "The attacking unit",
                 },
                 {
+                    "name": "attack_unit_size",
+                    "in": "query",
+                    "type": "int",
+                    "required": True,
+                    "description": "Number of models in the attacking unit",
+                },
+                {
                     "name": "defender",
                     "in": "query",
                     "type": "string",
@@ -71,6 +78,7 @@ class Attack(Resource):
     def get(self):
         result = simulate_attack(
             request.args.get("attacker"),
+            request.args.get("attack_unit_size"),
             request.args.get("defender"),
             request.args.get("weapon"),
         )

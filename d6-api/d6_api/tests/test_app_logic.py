@@ -5,11 +5,11 @@ def test_simulate_attack(mocker):
     # No hits
     mocker.patch("app_logic.roll_dice", return_value=[])
     result = simulate_attack(
-        "Captain in Terminator Armour", "Psychophage", "Relic weapon"
+        "Captain in Terminator Armour", 2, "Psychophage", "Relic weapon"
     )
     assert result == {
         "log": [
-            "Captain in Terminator Armour attacks 5 times.",
+            "Captain in Terminator Armour x2 attacks 10 times.",
             "[] => 0 attacks were successful.",
         ],
         "damage": 0,
@@ -18,11 +18,11 @@ def test_simulate_attack(mocker):
     # Hits, but no wounds
     mocker.patch("app_logic.roll_dice", side_effect=[[1], []])
     result = simulate_attack(
-        "Captain in Terminator Armour", "Psychophage", "Relic weapon"
+        "Captain in Terminator Armour", 2, "Psychophage", "Relic weapon"
     )
     assert result == {
         "log": [
-            "Captain in Terminator Armour attacks 5 times.",
+            "Captain in Terminator Armour x2 attacks 10 times.",
             "[1] => 1 attacks were successful.",
             "Relic weapon (strength 5) against Psychophage (toughness 9 requires 5+ to wound.",
             "[] => 0 attacks were wounding.",
@@ -33,11 +33,11 @@ def test_simulate_attack(mocker):
     # Hit and wound, but save
     mocker.patch("app_logic.roll_dice", side_effect=[[1], [1], [1]])
     result = simulate_attack(
-        "Captain in Terminator Armour", "Psychophage", "Relic weapon"
+        "Captain in Terminator Armour", 2, "Psychophage", "Relic weapon"
     )
     assert result == {
         "log": [
-            "Captain in Terminator Armour attacks 5 times.",
+            "Captain in Terminator Armour x2 attacks 10 times.",
             "[1] => 1 attacks were successful.",
             "Relic weapon (strength 5) against Psychophage (toughness 9 requires 5+ to wound.",
             "[1] => 1 attacks were wounding.",
@@ -50,11 +50,11 @@ def test_simulate_attack(mocker):
     # Hit and wound, no save
     mocker.patch("app_logic.roll_dice", side_effect=[[1], [1], []])
     result = simulate_attack(
-        "Captain in Terminator Armour", "Psychophage", "Relic weapon"
+        "Captain in Terminator Armour", 2, "Psychophage", "Relic weapon"
     )
     assert result == {
         "log": [
-            "Captain in Terminator Armour attacks 5 times.",
+            "Captain in Terminator Armour x2 attacks 10 times.",
             "[1] => 1 attacks were successful.",
             "Relic weapon (strength 5) against Psychophage (toughness 9 requires 5+ to wound.",
             "[1] => 1 attacks were wounding.",
