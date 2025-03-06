@@ -1,5 +1,4 @@
 import random
-from time import sleep
 from dotdict import dotdict
 
 _FACES = ["\u2680", "\u2681", "\u2682", "\u2683", "\u2684", "\u2685"]
@@ -18,8 +17,6 @@ def roll_dice(num_dice, sides=6, success_threshold=0):
         print("  => " + " ".join(_FACES[d - 1] for d in fail))
     else:
         print(" ".join(_FACES[d - 1] for d in roll))
-
-    sleep(1)
 
     return success if success_threshold else roll
 

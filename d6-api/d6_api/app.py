@@ -37,13 +37,33 @@ class Attack(Resource):
                     "type": "string",
                     "enum": weapons,
                     "required": True,
-                    "description": "The attacker\s weapon",
+                    "description": "The attacker's weapon",
                 },
             ],
             "responses": {
                 200: {
-                    "description": "The amount of damage resulting from the attack.",
-                    "type": "integer",
+                    "description": "The result of the attack simulation.",
+                    "content": {
+                        "application/json": {
+                            "examples": {
+                                "example1": {
+                                    "summary": "Successful response",
+                                    "value": {
+                                        "log": [
+                                            "Attacker rolled for random attacks...",
+                                            "Attacker attacks X times...",
+                                            "X attacks were successful...",
+                                            "Weapon requires Y+ to wound...",
+                                            "Z attacks were wounding...",
+                                            "Defender requires W+ to save...",
+                                            "V wounds were saved..."
+                                        ],
+                                        "damage": 10
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             },
         }
