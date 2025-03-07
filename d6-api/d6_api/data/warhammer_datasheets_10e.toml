@@ -15,6 +15,85 @@ wounds = 6
     armour_penetration = -2
     damage = 2
 
+["Terminator Squad"]
+name = "Terminator Squad"
+toughness = 5
+save = "2+"
+wounds = 3
+
+  ["Terminator Squad".Weapons]
+
+    ["Terminator Squad".Weapons."Assault cannon"]
+    name = "Assault cannon"
+    range = 24
+    attacks = 6
+    weapon_skill = "3+"
+    strength = 6
+    armour_penetration = 0
+    damage = 1
+
+    ["Terminator Squad".Weapons."Storm bolter"]
+    name = "Storm bolter"
+    range = 24
+    attacks = 2
+    weapon_skill = "3+"
+    strength = 4
+    armour_penetration = 0
+    damage = 1
+
+    ["Terminator Squad".Weapons."Power fist"]
+    name = "Power fist"
+    range = 0
+    attacks = 3
+    weapon_skill = "4+"
+    strength = 8
+    armour_penetration = -2
+    damage = 2
+
+    ["Terminator Squad".Weapons."Power weapon"]
+    name = "Power weapon"
+    range = 0
+    attacks = 3
+    weapon_skill = "3+"
+    strength = 5
+    armour_penetration = -2
+    damage = 1
+
+["Infernus Squad"]
+name = "Infernus Squad"
+toughness = 4
+save = "3+"
+wounds = 2
+
+  ["Infernus Squad".Weapons]
+
+    ["Infernus Squad".Weapons."Bolt pistol"]
+    name = "Bolt pistol"
+    range = 12
+    attacks = 1
+    weapon_skill = "3+"
+    strength = 4
+    armour_penetration = 0
+    damage = 1
+
+    ["Infernus Squad".Weapons."Pyreblaster"]
+    name = "Pyreblaster"
+    range = 12
+    attacks = "D6"
+    weapon_skill = "1+"
+    strength = 5
+    armour_penetration = 0
+    damage = 1
+
+    ["Infernus Squad".Weapons."Close combat weapon"]
+    name = "Close combat weapon"
+    range = 0
+    attacks = 3
+    weapon_skill = "3+"
+    strength = 4
+    armour_penetration = 0
+    damage = 1
+
 [Psychophage]
 name = "Psychophage"
 toughness = 9
@@ -31,3 +110,13 @@ wounds = 10
     strength = 6
     armour_penetration = -1
     damage = 2
+
+# [Termagants]
+# name = "Termagants"
+# toughness = 3
+# save = "5+"
+# wounds = 1
+
+#   [Termagants.Weapons]
+
+#     ["Termagants".
