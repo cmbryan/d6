@@ -21,7 +21,7 @@ Admin: <https://dashboard.render.com>
 ### Running in development
 
 ```bash
-FLASK_APP=d6_api/app.py poetry run flask run
+poetry run flask --app d6_api/app.py --debug run
 ```
 
 ### Running in production
