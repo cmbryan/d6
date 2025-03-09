@@ -40,16 +40,19 @@ def simulate_attack(attacker_name, attack_unit_size, defender_name, weapon_name)
     defender = datasheets[defender_name]
     weapon = attacker.Weapons[weapon_name]
 
-    attacks = weapon.attacks * attack_unit_size
-    random_attacks = re.match(r"(?P<num_dice>)?D6(\+(?P<modifier>\d))", str(weapon.attacks))
+    random_attacks = re.match(r"(?P<num_dice>\d+)?D6(\+(?P<modifier>\d+))?", str(weapon.attacks))
     if random_attacks:
         num_dice = (to_int(random_attacks.group("num_dice")) or 1) * attack_unit_size
         modifier = to_int(random_attacks.group("modifier"))
         roll = sum(roll_dice(num_dice))
-        result["log"].append(f"{attacker_name} x{attack_unit_size} rolled for random attacks ({random_attacks}) => {len(attacks)}.")
         attacks = roll + num_dice * modifier
+        result["log"].append(f"{attacker_name} x{attack_unit_size} rolled for random attacks ({weapon.attacks}) => {attacks}.")
+    else:
+        # Normal attacks
+        attacks = weapon.attacks * attack_unit_size
     result["log"].append(f"{attacker_name} x{attack_unit_size} attacks {attacks} times.")
 
+    result["log"].append(f"{weapon_name} requires {parse_stat(weapon.weapon_skill)}+ to hit.")
     hits = roll_dice(attacks, success_threshold=parse_stat(weapon.weapon_skill))
     result["log"].append(f"{hits} => {len(hits)} attacks were successful.")
 
