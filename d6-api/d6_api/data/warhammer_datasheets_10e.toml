@@ -15,6 +15,15 @@ wounds = 6
     armour_penetration = -2
     damage = 2
 
+    ["Captain in Terminator Armour".Weapons."Storm bolter 1"]
+    name = "Storm bolter 1"
+    range = 24
+    attacks = 2
+    weapon_skill = "3+"
+    strength = 4
+    armour_penetration = 0
+    damage = 1
+
 ["Terminator Squad"]
 name = "Terminator Squad"
 toughness = 5
@@ -32,8 +41,8 @@ wounds = 3
     armour_penetration = 0
     damage = 1
 
-    ["Terminator Squad".Weapons."Storm bolter"]
-    name = "Storm bolter"
+    ["Terminator Squad".Weapons."Storm bolter 2"]
+    name = "Storm bolter 2"
     range = 24
     attacks = 2
     weapon_skill = "3+"
@@ -111,12 +120,28 @@ wounds = 10
     armour_penetration = -1
     damage = 2
 
-# [Termagants]
-# name = "Termagants"
-# toughness = 3
-# save = "5+"
-# wounds = 1
+    [Psychophage.Weapons."Psychic torrent"]
+    name = "Psychic torrent"
+    range = 12
+    attacks = "D6"
+    weapon_skill = "1+"
+    strength = 6
+    armour_penetration = -1
+    damage = 1
 
-#   [Termagants.Weapons]
+[Termagants]
+name = "Termagants"
+toughness = 3
+save = "5+"
+wounds = 1
 
-#     ["Termagants".
+  [Termagants.Weapons]
+
+    ["Termagants".Weapons."Fleshborer"]
+    name = "Fleshborer"
+    range = 18
+    attacks = 1
+    weapon_skill = "4+"
+    strength = 5
+    armour_penetration = 0
+    damage = 1
