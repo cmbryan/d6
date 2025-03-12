@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 import tomllib as tl
 
-from util import convert_to_dot_dict, parse_stat, roll_dice, to_int
+from .util import convert_to_dot_dict, parse_stat, roll_dice, to_int
 
 current_module_dir = Path(__file__).resolve().parent
 

@@ -15,5 +15,8 @@ def create_app(*args, **kwargs):
 
     with app.app_context():
         db.create_all()
+        al.upgrade()
+
+    # TODO insert some test data
 
     return app

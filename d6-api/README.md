@@ -21,13 +21,13 @@ Admin: <https://dashboard.render.com>
 ### Running in development
 
 ```bash
-poetry run flask --app d6_api/app.py --debug run
+make run-debug
 ```
 
 ### Running in production
 
 ```bash
-poetry run gunicorn --chdir d6_api app:app
+make run-production
 ```
 
 ### Usage

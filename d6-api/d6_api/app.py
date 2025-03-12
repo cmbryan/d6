@@ -1,22 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from flask_restx import Api, Resource
-from flasgger import Swagger, swag_from
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
+from flasgger import swag_from
 
-from app_logic import units, weapons, simulate_attack
+from .app_logic import units, weapons, simulate_attack
 
-class Base(DeclarativeBase):
-  pass
 
-app = Flask(__name__)
-api = Api(app)
-app.config["SWAGGER"] = {"title": "My API", "uiversion": 3}
-swagger = Swagger(app)
-
-db = SQLAlchemy(model_class=Base)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test_data.db"  # TODO update for production
-db.init_app(app)
 
 
 class Attack(Resource):
@@ -93,8 +81,6 @@ class Attack(Resource):
         return jsonify(result)
 
 
+api = Api()
 api.add_resource(Attack, "/attack")
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+api.add_resource(Attack, "/")
