@@ -1,28 +1,30 @@
-from app_logic import simulate_attack
+from d6_api.app_logic import simulate_attack
 
 
 def test_simulate_attack(mocker):
     # No hits
-    mocker.patch("app_logic.roll_dice", return_value=[])
+    mocker.patch("d6_api.app_logic.roll_dice", return_value=[])
     result = simulate_attack(
         "Captain in Terminator Armour", 2, "Psychophage", "Relic weapon"
     )
     assert result == {
         "log": [
             "Captain in Terminator Armour x2 attacks 10 times.",
+            "Relic weapon requires 2+ to hit.",
             "[] => 0 attacks were successful.",
         ],
         "damage": 0,
     }
 
     # Hits, but no wounds
-    mocker.patch("app_logic.roll_dice", side_effect=[[1], []])
+    mocker.patch("d6_api.app_logic.roll_dice", side_effect=[[1], []])
     result = simulate_attack(
         "Captain in Terminator Armour", 2, "Psychophage", "Relic weapon"
     )
     assert result == {
         "log": [
             "Captain in Terminator Armour x2 attacks 10 times.",
+            "Relic weapon requires 2+ to hit.",
             "[1] => 1 attacks were successful.",
             "Relic weapon (strength 5) against Psychophage (toughness 9 requires 5+ to wound.",
             "[] => 0 attacks were wounding.",
@@ -31,13 +33,14 @@ def test_simulate_attack(mocker):
     }
 
     # Hit and wound, but save
-    mocker.patch("app_logic.roll_dice", side_effect=[[1], [1], [1]])
+    mocker.patch("d6_api.app_logic.roll_dice", side_effect=[[1], [1], [1]])
     result = simulate_attack(
         "Captain in Terminator Armour", 2, "Psychophage", "Relic weapon"
     )
     assert result == {
         "log": [
             "Captain in Terminator Armour x2 attacks 10 times.",
+            "Relic weapon requires 2+ to hit.",
             "[1] => 1 attacks were successful.",
             "Relic weapon (strength 5) against Psychophage (toughness 9 requires 5+ to wound.",
             "[1] => 1 attacks were wounding.",
@@ -48,13 +51,14 @@ def test_simulate_attack(mocker):
     }
 
     # Hit and wound, no save
-    mocker.patch("app_logic.roll_dice", side_effect=[[1], [1], []])
+    mocker.patch("d6_api.app_logic.roll_dice", side_effect=[[1], [1], []])
     result = simulate_attack(
         "Captain in Terminator Armour", 2, "Psychophage", "Relic weapon"
     )
     assert result == {
         "log": [
             "Captain in Terminator Armour x2 attacks 10 times.",
+            "Relic weapon requires 2+ to hit.",
             "[1] => 1 attacks were successful.",
             "Relic weapon (strength 5) against Psychophage (toughness 9 requires 5+ to wound.",
             "[1] => 1 attacks were wounding.",
