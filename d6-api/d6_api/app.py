@@ -1,10 +1,9 @@
-from flask import request, jsonify
+from flask import current_app, request, jsonify
 from flask_restx import Api, Resource
 from flasgger import swag_from
 
+from . import models
 from .app_logic import units, weapons, simulate_attack
-
-
 
 
 class Attack(Resource):
@@ -81,6 +80,13 @@ class Attack(Resource):
         return jsonify(result)
 
 
+class ListUnits(Resource):
+    def get(self):
+        with current_app.app_context():
+            units = [unit.name for unit in models.Unit.query.all()]
+        return jsonify(units)
+
+
 api = Api()
 api.add_resource(Attack, "/attack")
-api.add_resource(Attack, "/")
+api.add_resource(ListUnits, "/list_units")
