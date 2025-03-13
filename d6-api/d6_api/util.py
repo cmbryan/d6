@@ -1,5 +1,12 @@
+from dataclasses import asdict
+import json
+from pathlib import Path
 import random
 from dotdict import dotdict
+from flask import Flask, current_app
+
+import d6_api
+from .models import db
 
 _FACES = ["\u2680", "\u2681", "\u2682", "\u2683", "\u2684", "\u2685"]
 
@@ -46,3 +53,21 @@ def to_int(input: str) -> int:
     Returns int(input) or 0
     """
     return int(input) if input else 0
+
+
+def dump_db(app: Flask):
+    """
+    Dumps the database to a dictionary for version control.
+    """
+
+    filepath = Path(d6_api.__file__).resolve().parent / "data" / "data.json"
+    with open(filepath, "w") as fh:
+        with app.app_context():
+            json.dump(
+                {
+                    t.__tablename__: [asdict(row) for row in t.query.all()]
+                    for t in db.Model.__subclasses__()
+                    if hasattr(t, "__tablename__")
+                },
+                fh,
+            )

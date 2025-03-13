@@ -1,6 +1,9 @@
+from ast import dump
 from flask import current_app, request, jsonify
 from flask_restx import Api, Resource
 from flasgger import swag_from
+
+from d6_api.util import dump_db
 
 from . import models
 from .app_logic import units, weapons, simulate_attack

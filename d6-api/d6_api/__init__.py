@@ -28,7 +28,7 @@ def create_app(*args, **kwargs):
             db.session.commit()
 
         except Exception as e:  # Generic exception handling to accomodate sqlite3 and postgres
-            db.session.rollback()  # Rollback to prevent inconsistent state
+            db.session.rollback()
             print(f"Constraint error: {e}")
 
     return app
