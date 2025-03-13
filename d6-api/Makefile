@@ -13,5 +13,5 @@ shell:
 
 # Don't forget to set ALEMBIC_MSG
 db-upgrade:
-	poetry run flask --app d6_api db revision -m "$(ALEMBIC_MSG)"
+	poetry run flask --app d6_api db revision "$(ALEMBIC_MSG)"
 	poetry run flask --app d6_api db upgrade

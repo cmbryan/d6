@@ -1,10 +1,10 @@
 from flask import Flask
 from .app import api
+from . import models
 from .models import al, db
 
 
 def create_app(*args, **kwargs):
-    print(str(args) + str(kwargs))
     app = Flask(__name__)
     api.init_app(app)
     app.config["SWAGGER"] = {"title": "My API", "uiversion": 3}
@@ -17,6 +17,18 @@ def create_app(*args, **kwargs):
         db.create_all()
         al.upgrade()
 
-    # TODO insert some test data
+        try:
+            # Initial data
+            new_unit = models.Unit(name="Skeleton")
+            existing_unit = db.session.query(models.Unit).filter_by(name=new_unit.name).first()
+            if existing_unit:
+                db.session.delete(existing_unit)
+                db.session.commit()
+            db.session.add(new_unit)
+            db.session.commit()
+
+        except Exception as e:  # Generic exception handling to accomodate sqlite3 and postgres
+            db.session.rollback()  # Rollback to prevent inconsistent state
+            print(f"Constraint error: {e}")
 
     return app

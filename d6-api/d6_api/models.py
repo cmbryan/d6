@@ -1,3 +1,4 @@
+from typing import Optional
 from flask_alembic import Alembic
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import Mapped, mapped_column
@@ -22,6 +23,6 @@ al = Alembic(metadatas=Model.metadata)
 
 
 class Unit(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
+    id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None)
 
