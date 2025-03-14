@@ -1,14 +1,24 @@
 {
-  "unit": [
-    {
-      "name": "Skeleton",
-      "id": 1
-    }
-  ],
-  "weapon": [
-    {
-      "name": "Sword",
-      "id": 1
-    }
-  ]
+  "objects": {
+    "unit": [
+      {
+        "name": "Skeleton",
+        "id": 1
+      }
+    ],
+    "weapon": [
+      {
+        "name": "Sword",
+        "id": 1
+      }
+    ]
+  },
+  "associations": {
+    "unit_weapon_association": [
+      {
+        "unit_id": 1,
+        "weapon_id": 1
+      }
+    ]
+  }
 }

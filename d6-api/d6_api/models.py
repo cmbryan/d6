@@ -23,15 +23,23 @@ class Model(DeclarativeBase, MappedAsDataclass):
     def to_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns if column.name not in self.__no_serialize}
 
+
+class AssociationTable(Table):
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.columns}
+
+
 db = SQLAlchemy(model_class=Model)
 al = Alembic(metadatas=Model.metadata)
 
-unit_weapon_association = Table(
+unit_weapon_association = AssociationTable(
     'unit_weapon_association',
     Model.metadata,
     Column('unit_id', Integer, ForeignKey('unit.id'), primary_key=True),
     Column('weapon_id', Integer, ForeignKey('weapon.id'), primary_key=True)
 )
+
+association_tables = [unit_weapon_association]
 
 
 class Unit(db.Model):

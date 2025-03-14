@@ -22,3 +22,7 @@ db-dump:
 	mv d6_api/data/data.json d6_api/data/data.json.tmp
 	cat d6_api/data/data.json.tmp | jq . > d6_api/data/data.json
 	rm d6_api/data/data.json.tmp
+
+db-create:
+	# Create the database from data/data.json
+	poetry run python -c "from d6_api import create_app; app=create_app(); from d6_api.util import create_db; create_db(app)"
