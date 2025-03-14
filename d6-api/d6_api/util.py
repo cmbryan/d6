@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import random
 from dotdict import dotdict
-from flask import Flask, current_app
+from flask import Flask
 
 import d6_api
 from .models import db
@@ -65,7 +65,7 @@ def dump_db(app: Flask):
         with app.app_context():
             json.dump(
                 {
-                    t.__tablename__: [asdict(row) for row in t.query.all()]
+                    t.__tablename__: [row.to_dict() for row in t.query.all()]
                     for t in db.Model.__subclasses__()
                     if hasattr(t, "__tablename__")
                 },

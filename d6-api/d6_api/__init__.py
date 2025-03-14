@@ -1,3 +1,4 @@
+from re import U
 from flask import Flask
 from .app import api
 from . import models
@@ -19,12 +20,20 @@ def create_app(*args, **kwargs):
 
         try:
             # Initial data
-            new_unit = models.Unit(name="Skeleton")
+            new_unit = models.Unit(name="Skeleton", weapons=[])
             existing_unit = db.session.query(models.Unit).filter_by(name=new_unit.name).first()
             if existing_unit:
                 db.session.delete(existing_unit)
                 db.session.commit()
             db.session.add(new_unit)
+            db.session.commit()
+
+            new_weapon = models.Weapon(name="Sword", units=[new_unit])
+            existing_weapon = db.session.query(models.Weapon).filter_by(name="Sword").first()
+            if existing_weapon:
+                db.session.delete(existing_weapon)
+                db.session.commit()
+            db.session.add(new_weapon)
             db.session.commit()
 
         except Exception as e:  # Generic exception handling to accomodate sqlite3 and postgres

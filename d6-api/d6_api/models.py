@@ -1,9 +1,10 @@
 from flask_alembic import Alembic
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
-from sqlalchemy import MetaData
+from sqlalchemy import Column, ForeignKey, Integer, MetaData, Table
 
 class Model(DeclarativeBase, MappedAsDataclass):
     """
@@ -17,11 +18,33 @@ class Model(DeclarativeBase, MappedAsDataclass):
         "pk": "pk_%(table_name)s",  # primary key
     })
 
+    __no_serialize = []
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns if column.name not in self.__no_serialize}
+
 db = SQLAlchemy(model_class=Model)
 al = Alembic(metadatas=Model.metadata)
+
+unit_weapon_association = Table(
+    'unit_weapon_association',
+    Model.metadata,
+    Column('unit_id', Integer, ForeignKey('unit.id'), primary_key=True),
+    Column('weapon_id', Integer, ForeignKey('weapon.id'), primary_key=True)
+)
 
 
 class Unit(db.Model):
     name: Mapped[str] = mapped_column(unique=True)
+    weapons: Mapped[list["Weapon"]] = relationship("Weapon", secondary=unit_weapon_association, back_populates="units", default_factory=list)
     id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None)
 
+    __no_serialize = ["weapons"]
+
+
+class Weapon(db.Model):
+    name: Mapped[str] = mapped_column(unique=True)
+    units: Mapped[list["Unit"]] = relationship("Unit", secondary=unit_weapon_association, back_populates="weapons", default_factory=list)
+    id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None)
+
+    __no_serialize = ["units"]

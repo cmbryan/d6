@@ -1,1 +1,14 @@
-{"unit": [{"name": "Skeleton", "id": 1}]}
+{
+  "unit": [
+    {
+      "name": "Skeleton",
+      "id": 1
+    }
+  ],
+  "weapon": [
+    {
+      "name": "Sword",
+      "id": 1
+    }
+  ]
+}
