@@ -118,5 +118,4 @@ def create_db(app: Flask):
             else:
                 raise ValueError(f"Table '{table_name}' not found.")
 
-
         db.session.commit()
