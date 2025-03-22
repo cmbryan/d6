@@ -65,7 +65,7 @@ def dump_db(app: Flask):
             table_data = {
                 "objects": {
                     **{
-                        t.__tablename__: [row.to_dict() for row in t.query.all()]
+                        t.__tablename__: [row.to_table_dict() for row in t.query.all()]
                         for t in db.Model.__subclasses__()
                         if hasattr(t, "__tablename__")
                     }

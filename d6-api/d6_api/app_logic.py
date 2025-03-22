@@ -1,23 +1,10 @@
 from pathlib import Path
 import re
-import tomllib as tl
 
-from .util import convert_to_dot_dict, parse_stat, roll_dice, to_int
+from .models import Unit, Weapon
+from .util import parse_stat, roll_dice, to_int
 
 current_module_dir = Path(__file__).resolve().parent
-
-# Load datasheet data from a TOML file
-datasheets_path = current_module_dir / "data" / "warhammer_datasheets_10e.toml"
-
-try:
-    with open(datasheets_path, "rb") as f:
-        datasheets = convert_to_dot_dict(tl.load(f))
-except FileNotFoundError:
-    raise RuntimeError(f"Error: Datasheet file '{datasheets_path}' not found.")
-except tl.TOMLDecodeError:
-    raise RuntimeError(f"Error: Invalid format in '{datasheets_path}'.")
-units = list(datasheets.keys())
-weapons = sum([list(datasheets[unit].Weapons.keys()) for unit in datasheets], [])
 
 
 def simulate_attack(attacker_name, attack_unit_size, defender_name, weapon_name):
@@ -36,9 +23,13 @@ def simulate_attack(attacker_name, attack_unit_size, defender_name, weapon_name)
 
     result = {"log": [], "damage": 0}
     
-    attacker = datasheets[attacker_name]
-    defender = datasheets[defender_name]
-    weapon = attacker.Weapons[weapon_name]
+    attacker = Unit.query.where(Unit.name == attacker_name).first()
+    defender = Unit.query.where(Unit.name == defender_name).first()
+    weapon = Weapon.query.where(Weapon.name == weapon_name).first()
+
+    assert attacker, f"Attacker '{attacker_name}' not found."
+    assert defender, f"Defender '{defender_name}' not found."
+    assert weapon in attacker.weapons, f"{attacker_name} does not have a {weapon_name}."
 
     random_attacks = re.match(r"(?P<num_dice>\d+)?D6(\+(?P<modifier>\d+))?", str(weapon.attacks))
     if random_attacks:

@@ -9,6 +9,9 @@
     "weapon": [
       {
         "name": "Sword",
+        "weapon_skill": 3,
+        "strength": 4,
+        "attacks": 5,
         "id": 1
       }
     ]

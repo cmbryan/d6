@@ -1,4 +1,3 @@
-from re import U
 from flask import Flask
 from .app import api
 from . import models
@@ -20,7 +19,7 @@ def create_app(*args, **kwargs):
 
         try:
             # Initial data
-            new_unit = models.Unit(name="Skeleton", weapons=[])
+            new_unit = models.Unit(name="Skeleton", toughness=5, save="4+")
             existing_unit = db.session.query(models.Unit).filter_by(name=new_unit.name).first()
             if existing_unit:
                 db.session.delete(existing_unit)
@@ -28,7 +27,7 @@ def create_app(*args, **kwargs):
             db.session.add(new_unit)
             db.session.commit()
 
-            new_weapon = models.Weapon(name="Sword", units=[new_unit])
+            new_weapon = models.Weapon(name="Sword", weapon_skill="3+", strength=4, attacks=5, units=[new_unit])
             existing_weapon = db.session.query(models.Weapon).filter_by(name="Sword").first()
             if existing_weapon:
                 db.session.delete(existing_weapon)
