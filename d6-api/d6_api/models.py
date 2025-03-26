@@ -49,18 +49,25 @@ association_tables = [unit_weapon_association]
 
 class Unit(db.Model):
     name: Mapped[str] = mapped_column(unique=True)
-    toughness: Mapped[int] = mapped_column()
-    save: Mapped[str] = mapped_column()
+    toughness: Mapped[int] = mapped_column(default=1)
+    save: Mapped[str] = mapped_column(default="1+")
+    invulnerable_save: Mapped[str] = mapped_column(default="")
     weapons: Mapped[list["Weapon"]] = relationship("Weapon", secondary=unit_weapon_association, back_populates="units", default_factory=list)
     id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None)
 
 
 class Weapon(db.Model):
     name: Mapped[str] = mapped_column(unique=True)
-    weapon_skill: Mapped[str] = mapped_column()
-    strength: Mapped[int] = mapped_column()
+    range: Mapped[int] = mapped_column(default=0)
     attacks: Mapped[int] = mapped_column(default=1)
+    weapon_skill: Mapped[str] = mapped_column(default=1)
+    strength: Mapped[int] = mapped_column(default=1)
     armour_penetration: Mapped[int] = mapped_column(default=0)
+    damage: Mapped[int] = mapped_column(default=1)
+    rapid_fire: Mapped[int] = mapped_column(default=0)
+    anti_infantry: Mapped[str] = mapped_column(default="")
+    devastating_wounds: Mapped[bool] = mapped_column(default=False)
+
     units: Mapped[list["Unit"]] = relationship("Unit", secondary=unit_weapon_association, back_populates="weapons", default_factory=list)
     id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None)
 

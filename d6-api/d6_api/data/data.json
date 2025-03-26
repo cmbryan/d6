@@ -2,18 +2,57 @@
   "objects": {
     "unit": [
       {
-        "name": "Skeleton",
+        "name": "Captain in Terminator Armour",
+        "toughness": 5,
+        "save": "2+",
+        "invulnerable_save": "4+",
         "id": 1
       }
     ],
     "weapon": [
       {
-        "name": "Sword",
-        "weapon_skill": 3,
+        "name": "Storm bolter",
+        "range": 24,
+        "attacks": 2,
+        "weapon_skill": "3+",
         "strength": 4,
+        "armour_penetration": 0,
+        "damage": 1,
+        "rapid_fire": 2,
+        "id": 2
+      },
+      {
+        "name": "Combi-weapon",
+        "range": 24,
+        "attacks": 1,
+        "weapon_skill": "3+",
+        "strength": 4,
+        "armour_penetration": 0,
+        "damage": 1,
+        "anti_infantry": "4+",
+        "devastating_wounds": true,
+        "rapid_fire": 1,
+        "id": 3
+      },
+      {
+        "name": "Relic fist",
         "attacks": 5,
-        "id": 1
+        "weapon_skill": "2+",
+        "strength": 8,
+        "armour_penetration": -2,
+        "damage": 2,
+        "id": 4
+      },
+      {
+        "name": "Relic weapon",
+        "attacks": 6,
+        "weapon_skill": "2+",
+        "strength": 5,
+        "armour_penetration": -2,
+        "damage": 2,
+        "id": 5
       }
+
     ]
   },
   "associations": {
@@ -21,6 +60,18 @@
       {
         "unit_id": 1,
         "weapon_id": 1
+      },
+      {
+        "unit_id": 1,
+        "weapon_id": 2
+      },
+      {
+        "unit_id": 1,
+        "weapon_id": 3
+      },
+      {
+        "unit_id": 1,
+        "weapon_id": 4
       }
     ]
   }
