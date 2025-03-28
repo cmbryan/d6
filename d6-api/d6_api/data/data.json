@@ -19,7 +19,7 @@
         "armour_penetration": 0,
         "damage": 1,
         "rapid_fire": 2,
-        "id": 2
+        "id": 1
       },
       {
         "name": "Combi-weapon",
@@ -32,7 +32,7 @@
         "anti_infantry": "4+",
         "devastating_wounds": true,
         "rapid_fire": 1,
-        "id": 3
+        "id": 2
       },
       {
         "name": "Relic fist",
@@ -41,7 +41,7 @@
         "strength": 8,
         "armour_penetration": -2,
         "damage": 2,
-        "id": 4
+        "id": 3
       },
       {
         "name": "Relic weapon",
@@ -50,7 +50,7 @@
         "strength": 5,
         "armour_penetration": -2,
         "damage": 2,
-        "id": 5
+        "id": 4
       }
 
     ]

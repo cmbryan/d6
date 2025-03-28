@@ -1,35 +1,35 @@
 from pathlib import Path
 import re
 
-from .models import Unit, Weapon
+from .models import Unit, Weapon, db
 from .util import parse_stat, roll_dice, to_int
 
 current_module_dir = Path(__file__).resolve().parent
 
 
-def simulate_attack(attacker_name, attack_unit_size, defender_name, weapon_name):
+def simulate_attack(attacker_id: int, attack_unit_size: int, defender_id: int, weapon_id: int):
     """
     Simulates an attack. Currently hard-coded to use the 40k, 10th edition ruleset.
 
     Args:
-        attacker_name (str): The name of the attacking unit.
+        attacker_id (int): The id of the attacking unit.
         attack_unit_size (int): The number of models in the attacking unit.
-        defender_name (str): The name of the defending unit.
-        weapon_name (str): The name of the weapon used by the attacker.
+        defender_id (int): The id of the defending unit.
+        weapon_id (int): The id of the weapon used by the attacker.
 
     Returns:
         dict: A dictionary containing the result of the attack simulation, including the total damage inflicted and a log of actions.
     """
 
     result = {"log": [], "damage": 0}
-    
-    attacker = Unit.query.where(Unit.name == attacker_name).first()
-    defender = Unit.query.where(Unit.name == defender_name).first()
-    weapon = Weapon.query.where(Weapon.name == weapon_name).first()
 
-    assert attacker, f"Attacker '{attacker_name}' not found."
-    assert defender, f"Defender '{defender_name}' not found."
-    assert weapon in attacker.weapons, f"{attacker_name} does not have a {weapon_name}."
+    attacker = db.session.get(Unit, attacker_id)
+    defender = db.session.get(Unit, defender_id)
+    weapon = db.session.get(Weapon, weapon_id)
+
+    assert attacker, f"Attacker id:{attacker_id} not found."
+    assert defender, f"Defender id:{defender_id} not found."
+    assert weapon in attacker.weapons, f"{attacker.name} does not have a weapon id:{weapon_id}."
 
     random_attacks = re.match(r"(?P<num_dice>\d+)?D6(\+(?P<modifier>\d+))?", str(weapon.attacks))
     if random_attacks:
@@ -37,13 +37,13 @@ def simulate_attack(attacker_name, attack_unit_size, defender_name, weapon_name)
         modifier = to_int(random_attacks.group("modifier"))
         roll = sum(roll_dice(num_dice))
         attacks = roll + num_dice * modifier
-        result["log"].append(f"{attacker_name} x{attack_unit_size} rolled for random attacks ({weapon.attacks}) => {attacks}.")
+        result["log"].append(f"{attacker.name} x{attack_unit_size} rolled for random attacks ({weapon.attacks}) => {attacks}.")
     else:
         # Normal attacks
         attacks = weapon.attacks * attack_unit_size
-    result["log"].append(f"{attacker_name} x{attack_unit_size} attacks {attacks} times.")
+    result["log"].append(f"{attacker.name} x{attack_unit_size} with {weapon.name} ({weapon.attacks} attacks) for a total of {attacks} attacks.")
 
-    result["log"].append(f"{weapon_name} requires {parse_stat(weapon.weapon_skill)}+ to hit.")
+    result["log"].append(f"{weapon.name} requires {parse_stat(weapon.weapon_skill)}+ to hit.")
     hits = roll_dice(attacks, success_threshold=parse_stat(weapon.weapon_skill))
     result["log"].append(f"{hits} => {len(hits)} attacks were successful.")
 
@@ -60,8 +60,8 @@ def simulate_attack(attacker_name, attack_unit_size, defender_name, weapon_name)
         success_threshold = 5
     elif weapon.strength <= (defender.toughness / 2):
         success_threshold = 6
-    result["log"].append(f"{weapon_name} (strength {weapon.strength})"
-                         f" against {defender_name} (toughness {defender.toughness}"
+    result["log"].append(f"{weapon.name} (strength {weapon.strength})"
+                         f" against {defender.name} (toughness {defender.toughness})"
                          f" requires {success_threshold}+ to wound.")
 
     wounds = roll_dice(len(hits), success_threshold=success_threshold)
@@ -71,8 +71,8 @@ def simulate_attack(attacker_name, attack_unit_size, defender_name, weapon_name)
         return result
 
     save_threshold = min(parse_stat(defender.save) - weapon.armour_penetration, 6)
-    result["log"].append(f"{defender_name} (save value {defender.save})"
-                         f" is modified by {weapon_name} (armour penetration {weapon.armour_penetration}"
+    result["log"].append(f"{defender.name} (save value {defender.save})"
+                         f" is modified by {weapon.name} (armour penetration {weapon.armour_penetration})"
                          f" and therefore requires {save_threshold}+ to save (max 6).")
     saved_wounds = roll_dice(len(wounds), success_threshold=save_threshold)
     result["log"].append(f"{saved_wounds} => {len(saved_wounds)} / {len(wounds)} wounds were saved.")

@@ -18,15 +18,34 @@ class Model(DeclarativeBase, MappedAsDataclass):
         "pk": "pk_%(table_name)s",  # primary key
     })
 
-    def to_table_dict(self):
-        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
-    def to_dict(self):
-        attributes = self.to_table_dict()
-        relationships = inspect(self).relationships.keys()
-        for r_name in relationships:
-            attributes[r_name] = getattr(self, r_name).to_table_dict()
-        return attributes
+    def serialize(self):
+        """
+        Serializes a SQLAlchemy model instance into a dictionary.
+        Handles both attributes and relationships.
+
+        Args:
+            self: The SQLAlchemy model instance to serialize.
+
+        Returns:
+            dict: A dictionary representation of the model instance.
+        """
+        if self is None:
+            return None
+
+        # Get the model's attributes
+        data = {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
+
+        # Get the model's relationships
+        for rel in inspect(self).mapper.relationships:
+            rel_val = getattr(self, rel.key)
+            if rel.uselist:
+                data[rel.key] = [child.id for child in rel_val]
+            else:
+                data[rel.key] = rel_val.id
+
+        return data
+
 
 
 class AssociationTable(Table):
@@ -52,6 +71,7 @@ class Unit(db.Model):
     toughness: Mapped[int] = mapped_column(default=1)
     save: Mapped[str] = mapped_column(default="1+")
     invulnerable_save: Mapped[str] = mapped_column(default="")
+
     weapons: Mapped[list["Weapon"]] = relationship("Weapon", secondary=unit_weapon_association, back_populates="units", default_factory=list)
     id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None)
 

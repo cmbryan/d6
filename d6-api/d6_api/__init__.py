@@ -1,7 +1,7 @@
 from flask import Flask
 
 from d6_api.util import create_db
-from .app import api
+from .app import api, bp
 from .models import al, db
 
 
@@ -13,6 +13,8 @@ def create_app(*args, **kwargs):
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test_data.db"  # TODO update for production
     db.init_app(app)
     al.init_app(app)
+
+    app.register_blueprint(bp)
 
     with app.app_context():
         db.create_all()

@@ -1,9 +1,10 @@
-from flask import current_app, request, jsonify
+from flask import Blueprint, current_app, render_template, request, jsonify
 from flask_restx import Api, Resource, fields
 
 from . import models
 from .app_logic import simulate_attack
 
+bp = Blueprint('api', __name__)
 
 api = Api()
 
@@ -27,18 +28,18 @@ api_weapon = api.model('Weapon', {
 
 
 @api.route("/attack")
-@api.doc(params={'id': 'An ID'})
+@api.doc(params={
+    'attacker_id': 'ID of attacker',
+    'defender_id': 'ID of defender',
+    'weapon_id': 'ID of weapon used',
+})
 class Attack(Resource):
     def get(self):
-        assert request.args.get("attacker"), "Attacker is required."
-        assert request.args.get("defender"), "Defender is required."
-        assert request.args.get("weapon"), "Weapon is required."
-
         result = simulate_attack(
-            request.args.get("attacker"),
+            request.args.get("attacker_id"),
             request.args.get("attack_unit_size", 1),
-            request.args.get("defender"),
-            request.args.get("weapon"),
+            request.args.get("defender_id"),
+            request.args.get("weapon_id"),
         )
         return jsonify(result)
 
@@ -49,4 +50,18 @@ class ListUnits(Resource):
     @api.marshal_with(api_unit, as_list=True)
     def get(self):
         with current_app.app_context():
-            return [unit.to_table_dict() for unit in models.Unit.query.all()]
+            return [unit.serialize() for unit in models.Unit.query.all()]
+
+
+@api.route("/weapons")
+class ListWeapons(Resource):
+
+    @api.marshal_with(api_weapon, as_list=True)
+    def get(self):
+        with current_app.app_context():
+            return [weapon.serialize() for weapon in models.Weapon.query.all()]
+
+
+@bp.route("/play")
+def play():
+    return render_template("play.html")
