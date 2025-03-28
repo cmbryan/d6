@@ -3,5 +3,6 @@
         "src"
     ],
     "python.testing.pytestEnabled": true,
-    "python.testing.cwd": "d6-api/d6_api/tests"
+    "python.testing.cwd": "d6-api/d6_api/tests",
+    "makefile.configureOnOpen": false
 }
