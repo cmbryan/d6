@@ -51,28 +51,25 @@ def roll_to_hit(attacker_id: int, unit_size: int, defender_id: int, weapon_id: i
     return num_hits, roll, log
 
 
-def roll_to_wound(attacker_id: int, num_attacks: int, defender_id: int, weapon_id: int):
+def roll_to_wound(weapon_id: int, num_hits: int, defender_id: int):
     """
     Roll-to-wound, the second step of a 40k, 10th edition attack sequence.
 
     Args:
-        attacker_id (int): The id of the attacking unit.
-        num_attacks (int): The number of attacks being performed.
-        defender_id (int): The id of the defending unit.
         weapon_id (int): The id of the weapon used by the attacker.
+        num_hits (int): The number of successful hits.
+        defender_id (int): The id of the defending unit.
 
     Returns:
         tuple(int, list(int), list(str)): Number of wounds, a list of the dice numbers, and a log of actions.
     """
 
-    attacker = db.session.get(Unit, attacker_id)
-    defender = db.session.get(Unit, defender_id)
     weapon = db.session.get(Weapon, weapon_id)
+    defender = db.session.get(Unit, defender_id)
     log = []
 
-    assert attacker, f"Attacker id:{attacker_id} not found."
+    assert weapon, f"Weapon id:{weapon_id} not found."
     assert defender, f"Defender id:{defender_id} not found."
-    assert weapon in attacker.weapons, f"{attacker.name} does not have a weapon id:{weapon_id}."
 
     if weapon.strength >= (defender.toughness * 2):
         success_threshold = 2
@@ -87,7 +84,7 @@ def roll_to_wound(attacker_id: int, num_attacks: int, defender_id: int, weapon_i
     log.append(f"{weapon.name} (strength {weapon.strength}) against {defender.name} (toughness {defender.toughness}) requires {success_threshold}+ to wound.")
 
     # Number of wounds
-    num_wounds, roll = roll_dice(num_attacks, success_threshold=success_threshold)
+    num_wounds, roll = roll_dice(num_hits, success_threshold=success_threshold)
     log.append(f"{roll} => {num_wounds} attacks were wounding.")
 
     return num_wounds, roll, log

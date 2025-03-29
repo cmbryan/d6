@@ -49,17 +49,16 @@ class RollToHit(Resource):
 @api.route("/roll-to-wound")
 @api.doc(params={
     'attacker_id': 'ID of attacker',
-    'num_attacks': 'Number of attacks',
+    'num_hits': {'type': 'integer', 'description': 'Number of hits'},
     'defender_id': 'ID of defender',
     'weapon_id': 'ID of weapon used',
 })
 class RollToWound(Resource):
     def get(self):
         result = roll_to_wound(
-            request.args.get("attacker_id"),
-            request.args.get("num_attacks", 1),
-            request.args.get("defender_id"),
             request.args.get("weapon_id"),
+            request.args.get("num_hits", 1, type=int),
+            request.args.get("defender_id"),
         )
         return jsonify(result)
 

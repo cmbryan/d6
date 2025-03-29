@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attack Simulator</title>
+    <title>Warhammer 40k Attack Simulator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center">Attack Simulator</h1>
+        <h1 class="text-center">Warhammer 40k Attack Simulator</h1>
         <form id="rollToHitForm" class="mt-4">
+            <h2>Roll to Hit</h2>
             <div class="mb-3">
                 <label for="attacker" class="form-label">Attacker</label>
                 <select id="attacker" class="form-select" required>
@@ -35,6 +36,14 @@
             </div>
             <button type="button" id="rollToHit" class="btn btn-primary" disabled>Roll: Hits</button>
         </form>
+        <form id="rollToWoundForm" class="mt-4">
+            <h2>Roll to Wound</h2>
+            <div class="mb-3">
+                <label for="num_hits" class="form-label">Number of hits</label>
+                <input type="number" id="num_hits" class="form-control" value="" min="1" required>
+            </div>
+            <button type="button" id="rollToWound" class="btn btn-primary" disabled>Roll: Wounds</button>
+        </form>
         <div id="result" class="mt-4">
             <h3>Result</h3>
             <pre id="resultOutput" class="border p-3 bg-light"></pre>
@@ -43,14 +52,19 @@
 
     <script>
         const apiBaseUrl = ""; // Replace with your API base URL
-        const rollToHitButton = document.getElementById("rollToHit");
+
         const attackerDropdown = document.getElementById("attacker");
         const unitSizeInput = document.getElementById("unit_size");
         const defenderDropdown = document.getElementById("defender");
         const weaponDropdown = document.getElementById("weapon");
+
+        const numHitsInput = document.getElementById("num_hits");
+
+        const rollToHitButton = document.getElementById("rollToHit");
+        const rollToWoundButton = document.getElementById("rollToWound");
         
         // Function to check if all dropdowns have a selection
-        function checkDropdowns() {
+        function checkHitDropdowns() {
             const attackerSelected = attackerDropdown.value !== "";
             const unitSizeValid = unitSizeInput.checkValidity();
             const defenderSelected = defenderDropdown.value !== "";
@@ -58,6 +72,13 @@
 
             rollToHitButton.disabled = !(attackerSelected && defenderSelected && weaponSelected);
         }
+        function checkWoundDropdowns() {
+            const weaponSelected = weaponDropdown.value !== "";
+            const defenderSelected = defenderDropdown.value !== "";
+            const numHitsValid = numHitsInput.checkValidity();
+            rollToWoundButton.disabled = !(weaponSelected && defenderSelected && numHitsValid);
+        }
+        
         // Populate dropdowns
         async function populateDropdowns() {
             try {
@@ -96,31 +117,30 @@
                             weaponDropdown.appendChild(option);
                         }
                     });
-                     checkDropdowns();
+                    checkHitDropdowns();
+                    checkWoundDropdowns();
                 });
                 
                 // Add event listeners to all dropdowns
-                attackerDropdown.addEventListener("change", checkDropdowns);
-                defenderDropdown.addEventListener("change", checkDropdowns);
-                weaponDropdown.addEventListener("change", checkDropdowns);
-                unitSizeInput.addEventListener("input", checkDropdowns);
-                
+                attackerDropdown.addEventListener("change", checkHitDropdowns);
+                defenderDropdown.addEventListener("change", checkHitDropdowns);
+                weaponDropdown.addEventListener("change", checkHitDropdowns);
+                unitSizeInput.addEventListener("input", checkHitDropdowns);
+
+                weaponDropdown.addEventListener("change", checkWoundDropdowns);
+                defenderDropdown.addEventListener("change", checkWoundDropdowns);
+                numHitsInput.addEventListener("input", checkWoundDropdowns);
             } catch (error) {
                 console.error("Error fetching units:", error);
             }
         }
 
-        // Simulate attack
+        // Simulate hit roll
         async function rollToHit() {
             const attacker_id = document.getElementById("attacker").value;
             const unit_size = parseInt(document.getElementById("unit_size").value, 10);
             const defender_id = document.getElementById("defender").value;
             const weapon_id = document.getElementById("weapon").value;
-
-            if (!attacker_id || !defender_id || !weapon_id) {
-                alert("Please select an attacker, defender, and weapon.");
-                return;
-            }
 
             try {
                 const response = await axios.get(`${apiBaseUrl}/roll-to-hit`, {
@@ -134,6 +154,16 @@
 
                 // Display result
                 document.getElementById("resultOutput").textContent = JSON.stringify(response.data, null, 2);
+
+                // Update num_hits
+                if (response.data && response.data.length > 0 && response.data[0] !== undefined) {
+                    document.getElementById("num_hits").value = response.data[0];
+                    checkWoundDropdowns(); // Recheck wound dropdowns after updating num_hits
+                } else {
+                    console.warn("Response data does not contain expected result:", response.data);
+                    document.getElementById("num_hits").value = 0;
+                    checkWoundDropdowns();
+                }
             } catch (error) {
                 console.error("Error simulating attack:", error);
                 document.getElementById("resultOutput").textContent = "Error simulating attack: " + error.message;
@@ -141,8 +171,33 @@
             }
         }
 
-        // Event listener for the simulate button
+        // Simulate wound roll
+        async function rollToWound() {
+            const weapon_id = document.getElementById("weapon").value;
+            const num_hits = parseInt(document.getElementById("num_hits").value, 10);
+            const defender_id = document.getElementById("defender").value;
+
+            try {
+                const response = await axios.get(`${apiBaseUrl}/roll-to-wound`, {
+                    params: {
+                        weapon_id,
+                        num_hits,
+                        defender_id,
+                    }
+                });
+
+                // Display result
+                document.getElementById("resultOutput").textContent = JSON.stringify(response.data, null, 2);
+            } catch (error) {
+                console.error("Error simulating attack:", error);
+                document.getElementById("resultOutput").textContent = "Error simulating attack: " + error.message;
+                alert("Error simulating attack. Please try again.");
+            }
+        }
+
+        // Event listener for buttons
         document.getElementById("rollToHit").addEventListener("click", rollToHit);
+        document.getElementById("rollToWound").addEventListener("click", rollToWound);
 
         // Initialize the app
         populateDropdowns();
