@@ -22,7 +22,7 @@ api_weapon = api.model('Weapon', {
     'name': fields.String,
     'weapon_skill': fields.String,
     'strength': fields.Integer,
-    'attacks': fields.Integer,
+    'attacks': fields.String,
     'armour_penetration': fields.Integer,
     'units': fields.List(fields.Integer),
 })

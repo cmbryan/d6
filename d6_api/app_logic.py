@@ -31,16 +31,16 @@ def roll_to_hit(attacker_id: int, unit_size: int, defender_id: int, weapon_id: i
     assert weapon in attacker.weapons, f"{attacker.name} does not have a weapon id:{weapon_id}."
 
     # Number of attacks
-    random_attacks = re.match(r"(?P<num_dice>\d+)?D6(\+(?P<modifier>\d+))?", str(weapon.attacks))
+    random_attacks = re.match(r"(?P<num_dice>\d+)?D6(\+(?P<modifier>\d+))?", weapon.attacks)
     if random_attacks:
         num_dice = (to_int(random_attacks.group("num_dice")) or 1) * unit_size
         modifier = to_int(random_attacks.group("modifier"))
-        roll = sum(roll_dice(num_dice))
+        roll = sum(roll_dice(num_dice)[1])
         num_attacks = roll + num_dice * modifier
         log.append(f"{attacker.name} x{unit_size} rolled for random attacks ({weapon.attacks}) => {num_attacks}.")
     else:
         # Normal attacks
-        num_attacks = weapon.attacks * unit_size
+        num_attacks = int(weapon.attacks) * unit_size
     log.append(f"{attacker.name} x{unit_size} with {weapon.name} ({weapon.attacks} attacks) for a total of {num_attacks} attacks.")
 
     # Number of hits

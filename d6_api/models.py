@@ -79,7 +79,7 @@ class Unit(db.Model):
 class Weapon(db.Model):
     name: Mapped[str] = mapped_column(unique=True)
     range: Mapped[int] = mapped_column(default=0)
-    attacks: Mapped[int] = mapped_column(default=1)
+    attacks: Mapped[str] = mapped_column(default="1")
     weapon_skill: Mapped[str] = mapped_column(default=1)
     strength: Mapped[int] = mapped_column(default=1)
     armour_penetration: Mapped[int] = mapped_column(default=0)
