@@ -36,6 +36,7 @@
             </div>
             <button type="button" id="rollToHit" class="btn btn-primary" disabled>Roll: Hits</button>
         </form>
+        <hl/>
         <form id="rollToWoundForm" class="mt-4">
             <h2>Roll to Wound</h2>
             <div class="mb-3">
@@ -44,6 +45,16 @@
             </div>
             <button type="button" id="rollToWound" class="btn btn-primary" disabled>Roll: Wounds</button>
         </form>
+        <hl/>
+        <form id="rollToSaveForm" class="mt-4">
+            <h2>Roll to Save</h2>
+            <div class="mb-3">
+                <label for="num_wounds" class="form-label">Number of wounds</label>
+                <input type="number" id="num_wounds" class="form-control" value="" min="1" required>
+            </div>
+            <button type="button" id="rollToSave" class="btn btn-primary" disabled>Roll: Save</button>
+        </form>
+        <hl/>
         <div id="result" class="mt-4">
             <h3>Result</h3>
             <pre id="resultOutput" class="border p-3 bg-light"></pre>
@@ -59,24 +70,24 @@
         const weaponDropdown = document.getElementById("weapon");
 
         const numHitsInput = document.getElementById("num_hits");
+        const numWoundsInput = document.getElementById("num_wounds");
 
         const rollToHitButton = document.getElementById("rollToHit");
         const rollToWoundButton = document.getElementById("rollToWound");
+        const rollToSaveButton = document.getElementById("rollToSave");
         
         // Function to check if all dropdowns have a selection
-        function checkHitDropdowns() {
+        function checkDropdowns() {
             const attackerSelected = attackerDropdown.value !== "";
             const unitSizeValid = unitSizeInput.checkValidity();
             const defenderSelected = defenderDropdown.value !== "";
             const weaponSelected = weaponDropdown.value !== "";
+            const numHitsValid = numHitsInput.checkValidity();
+            const numWoundsValid = numWoundsInput.checkValidity();
 
             rollToHitButton.disabled = !(attackerSelected && defenderSelected && weaponSelected);
-        }
-        function checkWoundDropdowns() {
-            const weaponSelected = weaponDropdown.value !== "";
-            const defenderSelected = defenderDropdown.value !== "";
-            const numHitsValid = numHitsInput.checkValidity();
             rollToWoundButton.disabled = !(weaponSelected && defenderSelected && numHitsValid);
+            rollToSaveButton.disabled = !(weaponSelected && defenderSelected && numHitsValid && numWoundsValid);
         }
         
         // Populate dropdowns
@@ -117,25 +128,21 @@
                             weaponDropdown.appendChild(option);
                         }
                     });
-                    checkHitDropdowns();
-                    checkWoundDropdowns();
+                    checkDropdowns();
                 });
                 
                 // Add event listeners to all dropdowns
-                attackerDropdown.addEventListener("change", checkHitDropdowns);
-                defenderDropdown.addEventListener("change", checkHitDropdowns);
-                weaponDropdown.addEventListener("change", checkHitDropdowns);
-                unitSizeInput.addEventListener("input", checkHitDropdowns);
-
-                weaponDropdown.addEventListener("change", checkWoundDropdowns);
-                defenderDropdown.addEventListener("change", checkWoundDropdowns);
-                numHitsInput.addEventListener("input", checkWoundDropdowns);
+                attackerDropdown.addEventListener("change", checkDropdowns);
+                defenderDropdown.addEventListener("change", checkDropdowns);
+                weaponDropdown.addEventListener("change", checkDropdowns);
+                unitSizeInput.addEventListener("input", checkDropdowns);
+                numHitsInput.addEventListener("input", checkDropdowns);
             } catch (error) {
                 console.error("Error fetching units:", error);
             }
         }
 
-        // Simulate hit roll
+        // Hit roll
         async function rollToHit() {
             const attacker_id = document.getElementById("attacker").value;
             const unit_size = parseInt(document.getElementById("unit_size").value, 10);
@@ -158,11 +165,11 @@
                 // Update num_hits
                 if (response.data && response.data.length > 0 && response.data[0] !== undefined) {
                     document.getElementById("num_hits").value = response.data[0];
-                    checkWoundDropdowns(); // Recheck wound dropdowns after updating num_hits
+                    checkDropdowns(); // Recheck dropdowns after updating num_hits
                 } else {
                     console.warn("Response data does not contain expected result:", response.data);
                     document.getElementById("num_hits").value = 0;
-                    checkWoundDropdowns();
+                    checkDropdowns();
                 }
             } catch (error) {
                 console.error("Error simulating attack:", error);
@@ -171,7 +178,7 @@
             }
         }
 
-        // Simulate wound roll
+        // Wound roll
         async function rollToWound() {
             const weapon_id = document.getElementById("weapon").value;
             const num_hits = parseInt(document.getElementById("num_hits").value, 10);
@@ -188,6 +195,64 @@
 
                 // Display result
                 document.getElementById("resultOutput").textContent = JSON.stringify(response.data, null, 2);
+
+                // Update num_wounds
+                if (response.data && response.data.length > 0 && response.data[0] !== undefined) {
+                    document.getElementById("num_wounds").value = response.data[0];
+                    checkDropdowns(); // Recheck dropdowns after updating num_hits
+                } else {
+                    console.warn("Response data does not contain expected result:", response.data);
+                    document.getElementById("num_wounds").value = 0;
+                    checkDropdowns();
+                }
+            } catch (error) {
+                console.error("Error simulating attack:", error);
+                document.getElementById("resultOutput").textContent = "Error simulating attack: " + error.message;
+                alert("Error simulating attack. Please try again.");
+            }
+        }
+
+        // Save roll
+        async function rollToSave() {
+            const num_wounds = parseInt(document.getElementById("num_wounds").value, 10);
+            const defender_id = document.getElementById("defender").value;
+            const weapon_id = document.getElementById("weapon").value;
+
+            try {
+                var response = await axios.get(`${apiBaseUrl}/roll-to-save`, {
+                    params: {
+                        num_wounds,
+                        defender_id,
+                        weapon_id,
+                    }
+                });
+
+                // Display result
+                document.getElementById("resultOutput").textContent = JSON.stringify(response.data, null, 2);
+
+                // Note unsaved wounds
+                if (response.data && response.data.length > 0 && response.data[0] !== undefined) {
+                    const unsaved_wounds = response.data[0];
+                } else {
+                    console.warn("Response data does not contain expected result:", response.data);
+                    document.getElementById("num_wounds").value = 0;
+                    checkDropdowns();
+                }
+
+                response = await axios.get(`${apiBaseUrl}/inflict-damage`, {
+                    params: {
+                        num_wounds,
+                        weapon_id,
+                    }
+                });
+
+                // Notify
+                if (response.data && response.data.length > 0 && response.data[0] !== undefined) {
+                    const damage = response.data[0];
+                    alert(`Inflicted ${damage} damage!`);
+                } else {
+                    console.warn("Response data does not contain expected result:", response.data);
+                }
             } catch (error) {
                 console.error("Error simulating attack:", error);
                 document.getElementById("resultOutput").textContent = "Error simulating attack: " + error.message;
@@ -198,6 +263,7 @@
         // Event listener for buttons
         document.getElementById("rollToHit").addEventListener("click", rollToHit);
         document.getElementById("rollToWound").addEventListener("click", rollToWound);
+        document.getElementById("rollToSave").addEventListener("click", rollToSave);
 
         // Initialize the app
         populateDropdowns();

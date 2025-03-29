@@ -108,7 +108,7 @@ def roll_to_save(num_wounds: int, defender_id: int, weapon_id: int):
     weapon = db.session.get(Weapon, weapon_id)
     log = []
 
-    success_threshold = defender.save - weapon.armour_penetration
+    success_threshold = parse_stat(defender.save) - weapon.armour_penetration
     log.append(f"{defender.name} (save value {defender.save})"
                f" is modified by {weapon.name} (armour penetration {weapon.armour_penetration})"
                f" and therefore requires {success_threshold}+ to save (max 6).")

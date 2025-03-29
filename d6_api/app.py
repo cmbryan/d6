@@ -30,65 +30,65 @@ api_weapon = api.model('Weapon', {
 
 @api.route("/roll-to-hit")
 @api.doc(params={
-    'attacker_id': 'ID of attacker',
+    'attacker_id': {'type': 'integer', 'description': 'ID of attacker'},
     'unit_size': {'type': 'integer', 'description': 'Number of models in attacking unit'},
-    'defender_id': 'ID of defender',
-    'weapon_id': 'ID of weapon used',
+    'defender_id': {'type': 'integer', 'description': 'ID of defender'},
+    'weapon_id': {'type': 'integer', 'description': 'ID of weapon used'},
 })
 class RollToHit(Resource):
     def get(self):
         result = roll_to_hit(
-            request.args.get("attacker_id"),
+            request.args.get("attacker_id", type=int),
             request.args.get("unit_size", 1, type=int),
-            request.args.get("defender_id"),
-            request.args.get("weapon_id"),
+            request.args.get("defender_id", type=int),
+            request.args.get("weapon_id", type=int),
         )
         return jsonify(result)
 
 
 @api.route("/roll-to-wound")
 @api.doc(params={
-    'attacker_id': 'ID of attacker',
+    'attacker_id': {'type': 'integer', 'description': 'ID of attacker'},
     'num_hits': {'type': 'integer', 'description': 'Number of hits'},
-    'defender_id': 'ID of defender',
-    'weapon_id': 'ID of weapon used',
+    'defender_id': {'type': 'integer', 'description': 'ID of defender'},
+    'weapon_id': {'type': 'integer', 'description': 'ID of weapon used'},
 })
 class RollToWound(Resource):
     def get(self):
         result = roll_to_wound(
-            request.args.get("weapon_id"),
+            request.args.get("weapon_id", type=int),
             request.args.get("num_hits", 1, type=int),
-            request.args.get("defender_id"),
+            request.args.get("defender_id", type=int),
         )
         return jsonify(result)
 
 
 @api.route("/roll-to-save")
 @api.doc(params={
-    'num_wounds': 'Number of wounds',
-    'defender_id': 'ID of defender',
-    'weapon_id': 'ID of weapon used',
+    'num_wounds': {'type': 'integer', 'description': 'Number of wounds'},
+    'defender_id': {'type': 'integer', 'description': 'ID of defender'},
+    'weapon_id': {'type': 'integer', 'description': 'ID of weapon used'},
 })
 class RollToSave(Resource):
     def get(self):
         result = roll_to_save(
-            request.args.get("num_wounds", 1),
-            request.args.get("defender_id"),
-            request.args.get("weapon_id"),
+            request.args.get("num_wounds", 1, type=int),
+            request.args.get("defender_id", type=int),
+            request.args.get("weapon_id", type=int),
         )
         return jsonify(result)
 
 
 @api.route("/inflict-damage")
 @api.doc(params={
-    'num_unsaved_wounds': 'Unsaved wounds',
-    'weapon_id': 'ID of weapon used',
+    'num_unsaved_wounds': {'type': 'integer', 'description': 'Unsaved wounds'},
+    'weapon_id': {'type': 'integer', 'description': 'ID of weapon used'},
 })
 class InflictDamage(Resource):
     def get(self):
         result = inflict_damage(
-            request.args.get("num_unsaved_wounds", 1),
-            request.args.get("weapon_id"),
+            request.args.get("num_unsaved_wounds", 1, type=int),
+            request.args.get("weapon_id", type=int),
         )
         return jsonify(result)
 
