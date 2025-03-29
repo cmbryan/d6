@@ -10,12 +10,16 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Attack Simulator</h1>
-        <form id="attackForm" class="mt-4">
+        <form id="rollToHitForm" class="mt-4">
             <div class="mb-3">
                 <label for="attacker" class="form-label">Attacker</label>
                 <select id="attacker" class="form-select" required>
                     <option value="" disabled selected>Select an attacker</option>
                 </select>
+            </div>
+            <div class="mb-3">
+                <label for="unit_size" class="form-label">Unit size</label>
+                <input type="number" id="unit_size" class="form-control" value="1" min="1" required>
             </div>
             <div class="mb-3">
                 <label for="defender" class="form-label">Defender</label>
@@ -29,7 +33,7 @@
                     <option value="" disabled selected>Select a weapon</option>
                 </select>
             </div>
-            <button type="button" id="simulateAttack" class="btn btn-primary" disabled>Simulate Attack</button>
+            <button type="button" id="rollToHit" class="btn btn-primary" disabled>Roll: Hits</button>
         </form>
         <div id="result" class="mt-4">
             <h3>Result</h3>
@@ -39,18 +43,20 @@
 
     <script>
         const apiBaseUrl = ""; // Replace with your API base URL
-        const simulateAttackButton = document.getElementById("simulateAttack");
+        const rollToHitButton = document.getElementById("rollToHit");
         const attackerDropdown = document.getElementById("attacker");
+        const unitSizeInput = document.getElementById("unit_size");
         const defenderDropdown = document.getElementById("defender");
         const weaponDropdown = document.getElementById("weapon");
         
         // Function to check if all dropdowns have a selection
         function checkDropdowns() {
             const attackerSelected = attackerDropdown.value !== "";
+            const unitSizeValid = unitSizeInput.checkValidity();
             const defenderSelected = defenderDropdown.value !== "";
             const weaponSelected = weaponDropdown.value !== "";
 
-            simulateAttackButton.disabled = !(attackerSelected && defenderSelected && weaponSelected);
+            rollToHitButton.disabled = !(attackerSelected && defenderSelected && weaponSelected);
         }
         // Populate dropdowns
         async function populateDropdowns() {
@@ -97,6 +103,7 @@
                 attackerDropdown.addEventListener("change", checkDropdowns);
                 defenderDropdown.addEventListener("change", checkDropdowns);
                 weaponDropdown.addEventListener("change", checkDropdowns);
+                unitSizeInput.addEventListener("input", checkDropdowns);
                 
             } catch (error) {
                 console.error("Error fetching units:", error);
@@ -104,8 +111,9 @@
         }
 
         // Simulate attack
-        async function simulateAttack() {
+        async function rollToHit() {
             const attacker_id = document.getElementById("attacker").value;
+            const unit_size = parseInt(document.getElementById("unit_size").value, 10);
             const defender_id = document.getElementById("defender").value;
             const weapon_id = document.getElementById("weapon").value;
 
@@ -115,9 +123,10 @@
             }
 
             try {
-                const response = await axios.get(`${apiBaseUrl}/attack`, {
+                const response = await axios.get(`${apiBaseUrl}/roll-to-hit`, {
                     params: {
                         attacker_id,
+                        unit_size,
                         defender_id,
                         weapon_id
                     }
@@ -127,12 +136,13 @@
                 document.getElementById("resultOutput").textContent = JSON.stringify(response.data, null, 2);
             } catch (error) {
                 console.error("Error simulating attack:", error);
-                document.getElementById("resultOutput").textContent = "Error simulating attack.";
+                document.getElementById("resultOutput").textContent = "Error simulating attack: " + error.message;
+                alert("Error simulating attack. Please try again.");
             }
         }
 
         // Event listener for the simulate button
-        document.getElementById("simulateAttack").addEventListener("click", simulateAttack);
+        document.getElementById("rollToHit").addEventListener("click", rollToHit);
 
         // Initialize the app
         populateDropdowns();

@@ -1,8 +1,9 @@
 from flask import Blueprint, current_app, render_template, request, jsonify
 from flask_restx import Api, Resource, fields
 
+from d6_api.app_logic import inflict_damage, roll_to_hit, roll_to_save, roll_to_wound
+
 from . import models
-from .app_logic import simulate_attack
 
 bp = Blueprint('api', __name__)
 
@@ -27,18 +28,67 @@ api_weapon = api.model('Weapon', {
 })
 
 
-@api.route("/attack")
+@api.route("/roll-to-hit")
 @api.doc(params={
     'attacker_id': 'ID of attacker',
+    'unit_size': {'type': 'integer', 'description': 'Number of models in attacking unit'},
     'defender_id': 'ID of defender',
     'weapon_id': 'ID of weapon used',
 })
-class Attack(Resource):
+class RollToHit(Resource):
     def get(self):
-        result = simulate_attack(
+        result = roll_to_hit(
             request.args.get("attacker_id"),
-            request.args.get("attack_unit_size", 1),
+            request.args.get("unit_size", 1, type=int),
             request.args.get("defender_id"),
+            request.args.get("weapon_id"),
+        )
+        return jsonify(result)
+
+
+@api.route("/roll-to-wound")
+@api.doc(params={
+    'attacker_id': 'ID of attacker',
+    'num_attacks': 'Number of attacks',
+    'defender_id': 'ID of defender',
+    'weapon_id': 'ID of weapon used',
+})
+class RollToWound(Resource):
+    def get(self):
+        result = roll_to_wound(
+            request.args.get("attacker_id"),
+            request.args.get("num_attacks", 1),
+            request.args.get("defender_id"),
+            request.args.get("weapon_id"),
+        )
+        return jsonify(result)
+
+
+@api.route("/roll-to-save")
+@api.doc(params={
+    'num_wounds': 'Number of wounds',
+    'defender_id': 'ID of defender',
+    'weapon_id': 'ID of weapon used',
+})
+class RollToSave(Resource):
+    def get(self):
+        result = roll_to_save(
+            request.args.get("num_wounds", 1),
+            request.args.get("defender_id"),
+            request.args.get("weapon_id"),
+        )
+        return jsonify(result)
+
+
+@api.route("/inflict-damage")
+@api.doc(params={
+    'num_unsaved_wounds': 'Unsaved wounds',
+    'weapon_id': 'ID of weapon used',
+})
+class InflictDamage(Resource):
+    def get(self):
+        result = inflict_damage(
+            request.args.get("num_unsaved_wounds", 1),
             request.args.get("weapon_id"),
         )
         return jsonify(result)

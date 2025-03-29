@@ -10,21 +10,21 @@ from .models import db, association_tables
 _FACES = ["\u2680", "\u2681", "\u2682", "\u2683", "\u2684", "\u2685"]
 
 
-def roll_dice(num_dice, sides=6, success_threshold=0):
-    """Simulates rolling multiple dice."""
+def roll_dice(num_dice: int, sides=6, success_threshold=0):
+    """Simulate a dice roll.
+
+    Args:
+        num_dice (int): number of dice
+        sides (int, optional): Number of sides on each die. Defaults to 6.
+        success_threshold (int, optional): The minimum required to be successful. Defaults to 0.
+
+    Returns:
+        tuple(int, list(int)): num_success, dice_result
+    """
 
     roll = [random.randint(1, sides) for _ in range(num_dice)]
     success = [d for d in roll if d>=success_threshold]
-    fail = [d for d in roll if d<success_threshold]
-
-    # Display
-    if success_threshold > 0:
-        print("  => " + " ".join(_FACES[d - 1] for d in success))
-        print("  => " + " ".join(_FACES[d - 1] for d in fail))
-    else:
-        print(" ".join(_FACES[d - 1] for d in roll))
-
-    return success if success_threshold else roll
+    return (len(success), roll)
 
 
 def convert_to_dot_dict(data):
