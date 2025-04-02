@@ -73,7 +73,12 @@ class Unit(db.Model):
     invulnerable_save: Mapped[str] = mapped_column(default="")
 
     weapons: Mapped[list["Weapon"]] = relationship("Weapon", secondary=unit_weapon_association, back_populates="units", default_factory=list)
-    id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None)
+    id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None, nullable=False)
+
+    def __init__(self, *args, **kwargs):
+        """ Override to handle weapon_ids parameter """
+        weapons = [db.session.get(Weapon, w_id) for w_id in kwargs.pop("weapon_ids", [])]
+        return super().__init__(*args, weapons=weapons, **kwargs)
 
 
 class Weapon(db.Model):
@@ -89,5 +94,9 @@ class Weapon(db.Model):
     devastating_wounds: Mapped[bool] = mapped_column(default=False)
 
     units: Mapped[list["Unit"]] = relationship("Unit", secondary=unit_weapon_association, back_populates="weapons", default_factory=list)
-    id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None)
+    id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None, nullable=False)
 
+    def __init__(self, *args, **kwargs):
+        """ Override to handle unit_ids parameter """
+        units = [db.session.get(Unit, u_id) for u_id in kwargs.pop("unit_ids", [])]
+        return super().__init__(*args, units=units, **kwargs)

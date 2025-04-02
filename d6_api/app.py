@@ -4,6 +4,8 @@ from flask_restx import Api, Resource, fields
 from d6_api.app_logic import inflict_damage, roll_to_hit, roll_to_save, roll_to_wound
 
 from . import models
+from .models import db
+
 
 bp = Blueprint('api', __name__)
 
@@ -109,6 +111,30 @@ class ListWeapons(Resource):
     def get(self):
         with current_app.app_context():
             return [weapon.serialize() for weapon in models.Weapon.query.all()]
+
+
+@api.route("/add-unit", methods=["POST"])
+class AddUnit(Resource):
+
+    @api.expect(api_unit)
+    def post(self):
+        with current_app.app_context():
+            unit = models.Unit(**request.json)
+            db.session.add(unit)
+            db.session.commit()
+            return jsonify(unit.serialize())
+
+
+@api.route("/add-weapon", methods=["POST"])
+class AddWeapon(Resource):
+
+    @api.expect(api_weapon)
+    def post(self):
+        with current_app.app_context():
+            weapon = models.Weapon(**request.json)
+            db.session.add(weapon)
+            db.session.commit()
+            return jsonify(weapon.serialize())
 
 
 @bp.route("/play")
