@@ -66,8 +66,14 @@ unit_weapon_association = AssociationTable(
 association_tables = [unit_weapon_association]
 
 
+class Category(db.Model):
+    name: Mapped[str] = mapped_column(primary_key=True)
+    customizable: Mapped[bool] = mapped_column(default=False)
+
+
 class Unit(db.Model):
     name: Mapped[str] = mapped_column(unique=True)
+    category: Mapped[Category] = mapped_column(ForeignKey("category.name"))
     toughness: Mapped[int] = mapped_column(default=1)
     save: Mapped[str] = mapped_column(default="1+")
     invulnerable_save: Mapped[str] = mapped_column(default="")

@@ -1,47 +1,59 @@
 {
   "objects": {
+    "category": [
+      {
+        "name": "Warhammer 40k starter kit, 10th edition"
+      }
+    ],
     "unit": [
       {
         "name": "Captain in Terminator Armour",
+        "category" : 1,
         "toughness": 5,
         "save": "2+",
         "id": 1
       },
       {
         "name": "Terminator Squad",
+        "category" : 1,
         "toughness": 5,
         "save": "2+",
         "id": 2
       },
       {
         "name": "Infernus Squad",
+        "category" : 1,
         "toughness": 4,
         "save": "3+",
         "id": 3
       },
       {
         "name": "Tyranid Prime",
+        "category" : 1,
         "toughness": 5,
         "save": "4+",
         "id": 4
       },
       {
         "name": "Psychophage",
+        "category" : 1,
         "toughness": 9,
         "save": "3+",
-        "id": 4
-      },
-      {
-        "name": "Termagant",
-        "toughness": 3,
-        "save": "5+",
         "id": 5
       },
       {
-        "name": "Ripper swarm",
-        "toughness": 2,
+        "name": "Termagant",
+        "category" : 1,
+        "toughness": 3,
         "save": "5+",
         "id": 6
+      },
+      {
+        "name": "Ripper swarm",
+        "category" : 1,
+        "toughness": 2,
+        "save": "5+",
+        "id": 7
       }
     ],
     "weapon": [

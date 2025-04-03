@@ -17,6 +17,29 @@
             ],
             "jinja": true,
             "autoStartBrowser": false
+        },
+        {
+            "name": "Upgrade DB",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "d6_api",
+                "FLASK_DEBUG": "1"
+            },
+            "args": [
+                "db",
+                "revision",
+                "${input:message}",
+            ],
+        }
+    ],
+    "inputs": [
+        {
+            "id": "message",
+            "type": "promptString",
+            "description": "Enter the migration message:",
+            "default": "Initial migration"
         }
     ]
 }
