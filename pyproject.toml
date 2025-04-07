@@ -6,7 +6,7 @@ authors = [
     {name = "Chris Bryan",email = "chrismbryan@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "flask (>=3.1.0,<4.0.0)",
     "dotdict (>=0.1,<0.2)",
