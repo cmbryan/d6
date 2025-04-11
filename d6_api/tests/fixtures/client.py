@@ -8,6 +8,12 @@ def client():
     app = create_app()
     app.config["TESTING"] = True
     with app.test_client() as client:
+        with client.application.app_context():
+            db.session.query(Unit).delete()
+            db.session.query(Weapon).delete()
+            db.session.query(unit_weapon_association).delete()
+            db.session.commit()
+
         yield client
 
 

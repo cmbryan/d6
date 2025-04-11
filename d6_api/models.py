@@ -78,7 +78,7 @@ class Unit(db.Model):
     save: Mapped[str] = mapped_column(default="1+")
     invulnerable_save: Mapped[str] = mapped_column(default="")
 
-    weapons: Mapped[list["Weapon"]] = relationship("Weapon", secondary=unit_weapon_association, back_populates="units", default_factory=list)
+    weapons: Mapped[list["Weapon"]] = relationship("Weapon", secondary=unit_weapon_association, back_populates="units", default_factory=list, passive_deletes=True)
     id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None, nullable=False)
 
     def __init__(self, *args, **kwargs):
@@ -99,7 +99,7 @@ class Weapon(db.Model):
     anti_infantry: Mapped[str] = mapped_column(default="")
     devastating_wounds: Mapped[bool] = mapped_column(default=False)
 
-    units: Mapped[list["Unit"]] = relationship("Unit", secondary=unit_weapon_association, back_populates="weapons", default_factory=list)
+    units: Mapped[list["Unit"]] = relationship("Unit", secondary=unit_weapon_association, back_populates="weapons", default_factory=list, passive_deletes=True)
     id: Mapped[int|None] = mapped_column(primary_key=True, autoincrement=True, default=None, nullable=False)
 
     def __init__(self, *args, **kwargs):
