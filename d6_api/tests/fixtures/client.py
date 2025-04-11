@@ -1,6 +1,7 @@
 import pytest
 from d6_api import create_app
-from d6_api.models import Unit, Weapon, db
+from d6_api.app import Category
+from d6_api.models import Unit, Weapon, db, unit_weapon_association
 
 
 @pytest.fixture()
@@ -31,11 +32,11 @@ def populated_db(client):
         db.session.commit()
 
         # Create some test units
-        unit1 = Unit(name='Captain in Terminator Armour', toughness=5, save='2+')
+        unit1 = Unit(name='Captain in Terminator Armour', category=Category.STARTER_KIT_40K, toughness=5, save='2+')
         unit1.weapons.append(weapon1)
         unit1.weapons.append(weapon2)
 
-        unit2 = Unit(name='Psychophage', toughness=9, save='4+')
+        unit2 = Unit(name='Psychophage', category=Category.STARTER_KIT_40K, toughness=9, save='4+')
         unit2.weapons.append(weapon3)
 
         db.session.add_all([unit1, unit2])

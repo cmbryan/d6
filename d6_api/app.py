@@ -7,6 +7,11 @@ from . import models
 from .models import db
 
 
+# Constants
+class Category:
+    STARTER_KIT_40K = "Warhammer 40k starter kit, 10th edition"
+
+
 bp = Blueprint('api', __name__)
 
 api = Api()

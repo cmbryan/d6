@@ -1,5 +1,7 @@
 import pytest
 
+from d6_api.app import Category
+
 
 @pytest.mark.usefixtures("client")
 def test_landing(client):
@@ -45,6 +47,7 @@ def test_add_unit(client):
     # Then, add a unit bearing that weapon
     resp = client.post("/add-unit", json={
         "name": "Test Unit",
+        "category": Category.STARTER_KIT_40K,
         "toughness": "1",
         "save": "1+",
         "weapon_ids": [weapon_id]
@@ -52,6 +55,7 @@ def test_add_unit(client):
     assert resp.status_code == 200
     assert resp.json == {
         'id': 1,
+        'category': 'Warhammer 40k starter kit, 10th edition',
         'invulnerable_save': '',
         'name': 'Test Unit',
         'toughness': 1,
@@ -64,6 +68,7 @@ def test_add_weapon(client):
     # First add a unit
     resp = client.post("/add-unit", json={
         "name": "Test Unit",
+        "category": Category.STARTER_KIT_40K,
         "toughness": "1",
         "save": "1+",
     })
